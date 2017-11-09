@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">HackerNews</string>
+    <string name="dummy_story_title">Waymo now testing its self-driving cars on public roads with no one at the wheel (techcrunch.com)</string>
+    <string name="dummy_story_properties">850 points by lemiant 13 hours ago</string>
+    <string name="dummy_story_comments">441 comments</string>
+    <string name="story_properties">%1$s points by %2$s</string>
 </resources>

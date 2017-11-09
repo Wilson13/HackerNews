@@ -1,6 +1,6 @@
 package com.wilson.hackernews.mvp;
 
-import com.wilson.hackernews.model.TopStory;
+import com.wilson.hackernews.model.HackerNewsStory;
 
 import java.util.List;
 
@@ -10,13 +10,20 @@ import java.util.List;
 public interface GetHackerNewsContract {
 
     interface View {
-        void onFetchDataSuccess(List<TopStory> topStories);
 
-        void onFecthDataError();
+        void clearStories();
+
+        void onFetchStoriesSuccess(List<HackerNewsStory> hackerNewsStoryList);
+
+        void onFecthStoriesError();
     }
 
     interface Presenter {
-        void loadTopStories();
+        void loadTopStoriesID();
+
+        void loadMoreStoriesID();
+
+        void onDestroy();
     }
 
 }
