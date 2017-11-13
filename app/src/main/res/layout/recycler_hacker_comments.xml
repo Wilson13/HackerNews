@@ -10,54 +10,46 @@
     card_view:cardElevation="5dp"
     card_view:cardUseCompatPadding="true">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="15dp"
         android:layout_gravity="center"
-        android:background="@android:color/transparent">
+        android:background="@android:color/transparent"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tv_title"
+            android:id="@+id/tv_comment_properties"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:text="@string/dummy_story_title"
+            android:text="@string/dummy_comment_properties"
             android:textSize="@dimen/normal_size"
-            android:textColor="@color/colorBlack"
             android:gravity="center_vertical"
             android:background="@android:color/transparent" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tv_comment_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/tv_title"
-            android:layout_marginTop="5dp">
-            <TextView
-            android:id="@+id/tv_properties"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="7"
-            android:text="@string/dummy_story_properties"
+            android:layout_marginTop="5dp"
+            android:text="@string/dummy_comment_content"
             android:textSize="@dimen/small_size"
+            android:textColor="@color/colorBlack"
             android:background="@android:color/transparent" />
 
-            <TextView
-                android:id="@+id/tv_comments"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:text="@string/dummy_story_comments"
-                android:textSize="@dimen/small_size"
-                android:background="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tv_view_replies"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/comment_view_replies"
+            android:textSize="@dimen/small_size"
+            android:textColor="@color/colorPrimary"
+            android:background="@android:color/transparent" />
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </android.support.v7.widget.CardView>

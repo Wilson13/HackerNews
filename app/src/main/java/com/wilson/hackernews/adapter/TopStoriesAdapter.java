@@ -12,16 +12,21 @@ import com.wilson.hackernews.R;
 import com.wilson.hackernews.model.HackerNewsStory;
 import com.wilson.hackernews.other.MyApp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.HackerNewsStoryHolder> {
 
     private static final String TAG = "TopStoriesAdapter";
-    private List<HackerNewsStory> hackerNewsStoryList;
+    private List<HackerNewsStory> hackerNewsStoryList = new ArrayList<>();
     private Context context;
+    private CommentsClickedListener delegate;
 
-    public TopStoriesAdapter(List<HackerNewsStory> hackerNewsStoryList) {
-        this.hackerNewsStoryList = hackerNewsStoryList;
+    // Interface to pass comments click event to parent TopStoriesFragment
+    public interface CommentsClickedListener {
+        void commentsClicked(String[] commentsID);
+    }
+    public TopStoriesAdapter() {
         context = MyApp.get().getApplicationContext();
     }
 
@@ -33,7 +38,7 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
     }
 
     @Override
-    public void onBindViewHolder(final HackerNewsStoryHolder holder, int position) {
+    public void onBindViewHolder(HackerNewsStoryHolder holder, int position) {
         // Get story from HackerNews story list
         HackerNewsStory currentItem = hackerNewsStoryList.get(position);
         Log.d(TAG, "onBindViewHolder currentItem: " + currentItem.getTitle());
@@ -42,16 +47,33 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
         String score = currentItem.getScore();
         String byName = currentItem.getBy();
         String comments = currentItem.getDescendants();
+        final String[] kids = currentItem.getKids();
 
         // Display the information
         holder.title.setText(title);
         holder.properties.setText(context.getString(R.string.story_properties, score, byName));
-        holder.comments.setText(comments);
+        holder.comments.setText(context.getString(R.string.story_comments, comments));
+        holder.comments.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (delegate != null)
+                    delegate.commentsClicked(kids);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return hackerNewsStoryList.size();
+    }
+
+    public void setData(List<HackerNewsStory> hackerNewsStoryList) {
+        this.hackerNewsStoryList.clear();
+        this.hackerNewsStoryList.addAll(hackerNewsStoryList);
+    }
+
+    public void setDelegate(CommentsClickedListener delegate) {
+        this.delegate = delegate;
     }
 
     class HackerNewsStoryHolder extends RecyclerView.ViewHolder {

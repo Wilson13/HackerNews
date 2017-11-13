@@ -1,11 +1,13 @@
 package com.wilson.hackernews.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
- * POJO for HackerNewsStory (item of HackerNews API)
+ * POJO for HackerNews story
  */
 
-public class HackerNewsStory
-{
+public class HackerNewsStory implements Parcelable {
     private String id;
 
     private String title;
@@ -23,6 +25,30 @@ public class HackerNewsStory
     private String type;
 
     private String url;
+
+    protected HackerNewsStory(Parcel in) {
+        id = in.readString();
+        title = in.readString();
+        time = in.readInt();
+        score = in.readString();
+        descendants = in.readString();
+        by = in.readString();
+        kids = in.createStringArray();
+        type = in.readString();
+        url = in.readString();
+    }
+
+    public static final Creator<HackerNewsStory> CREATOR = new Creator<HackerNewsStory>() {
+        @Override
+        public HackerNewsStory createFromParcel(Parcel in) {
+            return new HackerNewsStory(in);
+        }
+
+        @Override
+        public HackerNewsStory[] newArray(int size) {
+            return new HackerNewsStory[size];
+        }
+    };
 
     public String getId ()
     {
@@ -118,5 +144,23 @@ public class HackerNewsStory
     public String toString()
     {
         return "ClassPojo [id = "+id+", title = "+title+", time = "+time+", score = "+score+", descendants = "+descendants+", by = "+by+", kids = "+kids+", type = "+type+", url = "+url+"]";
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(title);
+        dest.writeInt(time);
+        dest.writeString(score);
+        dest.writeString(descendants);
+        dest.writeString(by);
+        dest.writeStringArray(kids);
+        dest.writeString(type);
+        dest.writeString(url);
     }
 }

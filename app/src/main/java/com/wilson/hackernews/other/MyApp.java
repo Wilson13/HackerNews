@@ -2,9 +2,9 @@ package com.wilson.hackernews.other;
 
 import android.app.Application;
 
-import com.wilson.hackernews.mvp.AppComponent;
-import com.wilson.hackernews.mvp.AppModule;
-import com.wilson.hackernews.mvp.DaggerAppComponent;
+import com.wilson.hackernews.di.AppComponent;
+import com.wilson.hackernews.di.AppModule;
+import com.wilson.hackernews.di.DaggerAppComponent;
 
 public class MyApp extends Application {
 

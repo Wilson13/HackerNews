@@ -1,7 +1,25 @@
 <resources>
     <string name="app_name">HackerNews</string>
+
+    <!-- Top Stories Fragment -->
+    <string name="empty_top_stories">No stories loaded</string>
+    <string name="empty_top_stories_msg">Please check your Internet connection and try again.</string>
     <string name="dummy_story_title">Waymo now testing its self-driving cars on public roads with no one at the wheel (techcrunch.com)</string>
     <string name="dummy_story_properties">850 points by lemiant 13 hours ago</string>
     <string name="dummy_story_comments">441 comments</string>
     <string name="story_properties">%1$s points by %2$s</string>
+    <string name="story_comments">%1$s comments</string>
+    <string name="story_load_more">Load more</string>
+    <!-- Comments Fragment -->
+    <string name="empty_comments">No comments loaded</string>
+    <string name="empty_comments_msg">Please check your Internet connection and try again.</string>
+    <string name="dummy_comment_properties">Contingencies 4 hours ago</string>
+    <string name="dummy_comment_content">I imagine Mr Good Guy at OVH telling some others:
+"guys we have a single point of failure in our architecture with SBG, maybe we should…
+- naaah it's fine, we do not have time nor resources"
+Then shit happens.
+edit: I have no idea what is happening exactly, but OVH being what it is, it seems extremely weird that all datacenters "can" get down at the same time, and it looks like a serious architecture problem to me (or backup systems, like generators, not being correctly tested… whatever). I am really curious about the future explanation with what happened exactly
+edit2: Why all the downvotes? Even the status page of OVH is down, do not tell me it is good design. We are not here to be charitable, but realist.</string>
+    <string name="comment_view_replies">View replies</string>
+    <string name="comment_properties">%1$s %2$s ago</string>
 </resources>

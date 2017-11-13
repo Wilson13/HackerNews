@@ -9,7 +9,29 @@ import java.util.List;
  */
 public interface GetHackerNewsContract {
 
-    interface View {
+    interface StoriesView {
+
+        void clearStories();
+
+        void onFetchStoriesSuccess(List<HackerNewsStory> hackerNewsStoryList);
+
+        void onFecthStoriesError();
+
+        void showLoadMore();
+
+        void hideLoadMore();
+    }
+
+    interface StoriesPresenter {
+
+        void loadTopStoriesID();
+
+        void loadMoreStories();
+
+        void onDestroy();
+    }
+
+    interface CommentsView {
 
         void clearStories();
 
@@ -18,12 +40,12 @@ public interface GetHackerNewsContract {
         void onFecthStoriesError();
     }
 
-    interface Presenter {
-        void loadTopStoriesID();
+    interface CommentsPresenter {
 
-        void loadMoreStoriesID();
+        void loadComments(String[] commentsID);
 
-        void onDestroy();
+        void loadComment();
+
     }
 
 }

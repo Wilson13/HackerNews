@@ -1,5 +1,6 @@
 package com.wilson.hackernews.other;
 
+import com.wilson.hackernews.model.HackerNewsComment;
 import com.wilson.hackernews.model.HackerNewsStory;
 
 import io.reactivex.Observable;
@@ -14,4 +15,7 @@ public interface HackerNewsAPI {
 
     @GET("item/{id}.json")
     Observable<HackerNewsStory> getStory(@Path("id") String id);
+
+    @GET("item/{id}.json")
+    Observable<HackerNewsComment> getItem(@Path("id") String id);
 }
