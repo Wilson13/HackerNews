@@ -9,7 +9,7 @@
     <string name="dummy_story_title">Waymo now testing its self-driving cars on public roads with no one at the wheel (techcrunch.com)</string>
     <string name="dummy_story_properties">850 points by lemiant 13 hours ago</string>
     <string name="dummy_story_comments">441 comments</string>
-    <string name="story_properties">%1$s points by %2$s</string>
+    <string name="story_properties">%1$s points by %2$s %3$s ago</string>
     <string name="story_comments">%1$s comments</string>
 
     <!-- Comments Fragment -->
@@ -25,4 +25,7 @@ edit: I have no idea what is happening exactly, but OVH being what it is, it see
 edit2: Why all the downvotes? Even the status page of OVH is down, do not tell me it is good design. We are not here to be charitable, but realist.</string>
     <string name="comment_view_replies">View replies</string>
     <string name="comment_properties">%1$s %2$s ago</string>
+
+    <string name="title_replies">Replies</string>
+
 </resources>

@@ -1,6 +1,5 @@
 package com.wilson.hackernews.fragment;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,10 +14,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.wilson.hackernews.R;
-import com.wilson.hackernews.adapter.CommentsAdapter;
+import com.wilson.hackernews.adapter.RepliesAdapter;
 import com.wilson.hackernews.model.HackerNewsComment;
 import com.wilson.hackernews.mvp.GetHackerNewsContract;
 import com.wilson.hackernews.mvp.HNCommentsPresenter;
+import com.wilson.hackernews.other.MyApp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,14 +33,9 @@ import static com.wilson.hackernews.other.Constants.COMMENTS_FRAGMENT_ARGUMENT_K
 public class RepliesFragment extends Fragment implements GetHackerNewsContract.CommentsView, View.OnClickListener {
 
     private static final String TAG = "CommentsFragment";
-    private CommentsAdapter commentsAdapter;
+    private RepliesAdapter repliesAdapter;
     private List<HackerNewsComment> hackerNewsCommentList = new ArrayList<>();
-    private CommentsListener delegate;
-    private String[] commentsID;
-
-    public interface CommentsListener{
-        void showReplies(String[] repliesID);
-    }
+    private String[] repliesID;
 
     @Inject
     HNCommentsPresenter presenter;
@@ -51,12 +46,11 @@ public class RepliesFragment extends Fragment implements GetHackerNewsContract.C
     @BindView(R.id.ll_empty_comments) LinearLayout emptyCommentsLL;
     @BindView(R.id.tv_load_more) TextView loadMoreTV;
 
-    public static RepliesFragment newInstance(String[] commentsID)
+    public static RepliesFragment newInstance(String[] repliesID)
     {
         RepliesFragment f = new RepliesFragment();
         Bundle args = new Bundle();
-        args.putStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY, commentsID);
-        //args.putParcelable(COMMENTS_FRAGMENT_ARGUMENT_KEY, story);
+        args.putStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY, repliesID);
         f.setArguments(args);
         return f;
     }
@@ -77,38 +71,22 @@ public class RepliesFragment extends Fragment implements GetHackerNewsContract.C
             return;
         }
         Bundle args = getArguments();
-        //commentsID = args.getParcelable(COMMENTS_FRAGMENT_ARGUMENT_KEY);
-        commentsID = args.getStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY);
+        //repliesID = args.getParcelable(COMMENTS_FRAGMENT_ARGUMENT_KEY);
+        repliesID = args.getStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY);
 
-        //MyApp.getAppComponent().inject(this);
+        MyApp.getAppComponent().inject(this);
         presenter.setView(this);
-        presenter.loadComments(commentsID);
+        presenter.loadComments(repliesID);
 
         commentsSRL.setEnabled(false); // Disable refresh function
         commentsSRL.setRefreshing(true); // Show refreshing animation
-        commentsAdapter = new CommentsAdapter();
-        commentsAdapter.setComments(hackerNewsCommentList);
+        repliesAdapter = new RepliesAdapter();
+        repliesAdapter.setComments(hackerNewsCommentList);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         commentsRV.setLayoutManager(mLayoutManager);
-        commentsRV.setAdapter(commentsAdapter);
+        commentsRV.setAdapter(repliesAdapter);
         loadMoreTV.setOnClickListener(this);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            delegate = (CommentsListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
-                    + " must implement CommentsListener");
-        }
     }
 
     @Override
@@ -118,16 +96,11 @@ public class RepliesFragment extends Fragment implements GetHackerNewsContract.C
     }
 
     @Override
-    public void clearStories() {
-        hackerNewsCommentList.clear();
-    }
-
-    @Override
     public void onFetchCommentsSuccess(List<HackerNewsComment> hackerNewsCommentList) {
         Log.d(TAG, "onFetchCommentsSuccess: " + hackerNewsCommentList.size());
         this.hackerNewsCommentList.clear();
         this.hackerNewsCommentList.addAll(hackerNewsCommentList);
-        commentsAdapter.notifyDataSetChanged();
+        repliesAdapter.notifyDataSetChanged();
         commentsSRL.setRefreshing(false);
         showStoriesLoaded();
     }

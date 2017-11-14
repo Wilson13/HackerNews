@@ -34,8 +34,6 @@ public interface GetHackerNewsContract {
 
     interface CommentsView {
 
-        void clearStories();
-
         void onFetchCommentsSuccess(List<HackerNewsComment> hackerNewsCommentList);
 
         void onFecthStoriesError();

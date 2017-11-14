@@ -19,38 +19,27 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tv_title"
+            android:id="@+id/tv_comment_properties"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:text="@string/dummy_story_title"
+            android:text="@string/dummy_comment_properties"
             android:textSize="@dimen/normal_size"
-            android:textColor="@color/colorBlack"
             android:gravity="center_vertical"
             android:background="@android:color/transparent" />
 
         <TextView
-            android:id="@+id/tv_properties"
-            android:layout_width="wrap_content"
+            android:id="@+id/tv_comment_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="@string/dummy_story_properties"
+            android:text="@string/dummy_comment_content"
             android:textSize="@dimen/small_size"
+            android:textColor="@color/colorBlack"
+            android:autoLink="web"
             android:background="@android:color/transparent" />
-
-        <TextView
-            android:id="@+id/tv_comments"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="@string/dummy_story_comments"
-            android:textSize="@dimen/small_size"
-            android:textColor="@color/colorPrimary"
-            android:background="@android:color/transparent"
-            android:clickable="true"
-            android:focusable="true" />
 
     </LinearLayout>
 

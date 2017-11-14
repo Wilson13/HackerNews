@@ -90,17 +90,6 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        //hackerNewsStoryList.clear();
-//        hackerNewsStoryList.addAll(DBHelper.getAllCountries());
-//        if (topStoriesRV.getAdapter() == null) {
-//            topStoriesAdapter = new TopStoriesAdapter(hackerNewsStoryList);
-//        }
-//        TopStoriesAdapter.notifyDataSetChanged();
-    }
-
-    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         try {

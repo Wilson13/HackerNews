@@ -16,7 +16,7 @@ import com.wilson.hackernews.other.MyApp;
 
 import java.util.List;
 
-public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.HackerNewsCommentHolder> {
+public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.HackerNewsCommentHolder> {
 
     private static final String TAG = "CommentsAdapter";
     private List<HackerNewsComment> hackerNewsCommentsList;
@@ -28,14 +28,14 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
         void repliesClicked(String[] repliesID);
     }
 
-    public CommentsAdapter() {
+    public RepliesAdapter() {
         context = MyApp.get().getApplicationContext();
     }
 
     @Override
     public HackerNewsCommentHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View inflatedView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.recycler_hacker_comments, parent, false);
+                .inflate(R.layout.recycler_hacker_replies, parent, false);
         return new HackerNewsCommentHolder(inflatedView);
     }
 
@@ -47,7 +47,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
 
         String content = currentItem.getText();
         String byName = currentItem.getBy();
-        final String[] kids = currentItem.getKids();
         long time = currentItem.getTime();
 
         // Display the information
@@ -58,20 +57,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
             holder.content.setText(Html.fromHtml(content , Html.FROM_HTML_MODE_LEGACY));
         else
             holder.content.setText(Html.fromHtml(content));
-
-        // Display "View replies" if there are replies to this comment
-        // (showing only 1 level as stated in the requirement).
-        if (kids != null && kids.length > 0)
-            holder.viewReplies.setVisibility(View.VISIBLE);
-
-        holder.viewReplies.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "viewreplies clicked!");
-                if (delegate != null)
-                    delegate.repliesClicked(kids);
-            }
-        });
     }
 
     @Override
@@ -91,13 +76,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
 
         TextView properties;
         TextView content;
-        TextView viewReplies;
 
         HackerNewsCommentHolder(View itemView) {
             super(itemView);
             properties = (TextView) itemView.findViewById(R.id.tv_comment_properties);
             content = (TextView) itemView.findViewById(R.id.tv_comment_content);
-            viewReplies = (TextView) itemView.findViewById(R.id.tv_view_replies);
         }
     }
 }

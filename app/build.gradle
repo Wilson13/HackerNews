@@ -44,7 +44,7 @@ android {
 }
 
 jacoco {
-    // only this verions worked
+    // Higher versions didn't work
     toolVersion = '0.7.4+'
 }
 

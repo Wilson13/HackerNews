@@ -31,7 +31,7 @@ import butterknife.ButterKnife;
 
 import static com.wilson.hackernews.other.Constants.COMMENTS_FRAGMENT_ARGUMENT_KEY;
 
-public class CommentsFragment extends Fragment implements GetHackerNewsContract.CommentsView, View.OnClickListener {
+public class CommentsFragment extends Fragment implements GetHackerNewsContract.CommentsView, View.OnClickListener, CommentsAdapter.RepliesClickedListener {
 
     private static final String TAG = "CommentsFragment";
     private CommentsAdapter commentsAdapter;
@@ -67,6 +67,20 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_comments, container, false);
         ButterKnife.bind(this, v);
+
+        Bundle args = getArguments();
+        commentsID = args.getStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY);
+
+//        if (savedInstanceState != null) {
+//            ArrayList<HackerNewsComment> savedList = args.getParcelable("COMMENTS_FRAGMENT_PARCELABLE_COMMENTS");
+//
+//            // Obtain saved Comments ArrayList (orientation changes)
+//            if (savedList != null) {
+//                hackerNewsCommentList.clear();
+//                hackerNewsCommentList.addAll(savedList);
+//                Log.d(TAG, "hackerNewsCommentList.size(): " + hackerNewsCommentList.size());
+//            }
+//        }
         return v;
     }
 
@@ -74,21 +88,20 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (savedInstanceState != null) {
-            return;
-        }
+        //Log.d(TAG, "onViewCreated savedInstanceState == null");
         Bundle args = getArguments();
         //commentsID = args.getParcelable(COMMENTS_FRAGMENT_ARGUMENT_KEY);
         commentsID = args.getStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY);
 
         MyApp.getAppComponent().inject(this);
         presenter.setView(this);
-        presenter.loadComments(commentsID);
+        presenter.loadComments(commentsID); // Pull comments from server
 
         commentsSRL.setEnabled(false); // Disable refresh function
         commentsSRL.setRefreshing(true); // Show refreshing animation
         commentsAdapter = new CommentsAdapter();
         commentsAdapter.setComments(hackerNewsCommentList);
+        commentsAdapter.setDelegate(this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         commentsRV.setLayoutManager(mLayoutManager);
@@ -97,8 +110,10 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState");
+        outState.putParcelableArrayList("COMMENTS_FRAGMENT_PARCELABLE_COMMENTS", new ArrayList<>(hackerNewsCommentList));
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -116,11 +131,6 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     public void onClick(View v) {
         commentsSRL.setRefreshing(true);
         presenter.loadMoreComments();
-    }
-
-    @Override
-    public void clearStories() {
-        hackerNewsCommentList.clear();
     }
 
     @Override
@@ -147,6 +157,12 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     @Override
     public void hideLoadMore() {
         loadMoreTV.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void repliesClicked(String[] repliesID) {
+        if (delegate != null)
+            delegate.showReplies(repliesID);;
     }
 
     private void showStoriesEmpty() {

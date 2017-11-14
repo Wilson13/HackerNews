@@ -25,6 +25,7 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
     public interface CommentsClickedListener {
         void commentsClicked(String[] commentsID);
     }
+
     public TopStoriesAdapter() {
         context = MyApp.get().getApplicationContext();
     }
@@ -49,9 +50,33 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
         String comments = currentItem.getDescendants();
         final String[] kids = currentItem.getKids();
 
+        String timeCommented ="";
+        long time = currentItem.getTime();
+        long currentTime = System.currentTimeMillis() / 1000;
+
+        Log.d(TAG, "time: " + time);
+        Log.d(TAG, "currentTime: " + currentTime);
+        long commentedTime = currentTime - time;
+
+        if (commentedTime > (60 * 60)) {
+            long commentTimeHour = commentedTime / (60 * 60);
+
+            if (commentTimeHour > 1)
+                timeCommented = commentTimeHour + " hours";
+            else
+                timeCommented = commentTimeHour + " hour";
+
+        } else if (commentedTime > (60)) {
+            timeCommented = commentedTime / (60) + " mins";
+        } else if (commentedTime > (1000)) {
+            timeCommented = commentedTime + " secs";
+        } else {
+            timeCommented = 0 + " sec";
+        }
+
         // Display the information
         holder.title.setText(title);
-        holder.properties.setText(context.getString(R.string.story_properties, score, byName));
+        holder.properties.setText(context.getString(R.string.story_properties, score, byName, timeCommented));
         holder.comments.setText(context.getString(R.string.story_comments, comments));
         holder.comments.setOnClickListener(new View.OnClickListener() {
             @Override

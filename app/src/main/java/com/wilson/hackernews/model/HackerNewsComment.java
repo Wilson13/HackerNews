@@ -1,14 +1,17 @@
 package com.wilson.hackernews.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * POJO for HackerNews comment
  */
 
-public class HackerNewsComment
+public class HackerNewsComment implements Parcelable
 {
     private String id;
 
-    private int time;
+    private long time;
 
     private String text;
 
@@ -20,6 +23,28 @@ public class HackerNewsComment
 
     private String type;
 
+    protected HackerNewsComment(Parcel in) {
+        id = in.readString();
+        time = in.readLong();
+        text = in.readString();
+        parent = in.readString();
+        by = in.readString();
+        kids = in.createStringArray();
+        type = in.readString();
+    }
+
+    public static final Creator<HackerNewsComment> CREATOR = new Creator<HackerNewsComment>() {
+        @Override
+        public HackerNewsComment createFromParcel(Parcel in) {
+            return new HackerNewsComment(in);
+        }
+
+        @Override
+        public HackerNewsComment[] newArray(int size) {
+            return new HackerNewsComment[size];
+        }
+    };
+
     public String getId ()
     {
         return id;
@@ -30,12 +55,12 @@ public class HackerNewsComment
         this.id = id;
     }
 
-    public int getTime ()
+    public long getTime ()
     {
         return time;
     }
 
-    public void setTime (int time)
+    public void setTime (long time)
     {
         this.time = time;
     }
@@ -94,5 +119,21 @@ public class HackerNewsComment
     public String toString()
     {
         return "ClassPojo [id = "+id+", time = "+time+", text = "+text+", parent = "+parent+", by = "+by+", kids = "+kids+", type = "+type+"]";
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(text);
+        dest.writeLong(time);
+        dest.writeString(parent);
+        dest.writeString(by);
+        dest.writeStringArray(kids);
+        dest.writeString(type);
     }
 }

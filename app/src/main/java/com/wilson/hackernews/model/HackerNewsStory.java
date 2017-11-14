@@ -12,7 +12,7 @@ public class HackerNewsStory implements Parcelable {
 
     private String title;
 
-    private int time;
+    private long time;
 
     private String score;
 
@@ -70,12 +70,12 @@ public class HackerNewsStory implements Parcelable {
         this.title = title;
     }
 
-    public int getTime ()
+    public long getTime ()
     {
         return time;
     }
 
-    public void setTime (int time)
+    public void setTime (long time)
     {
         this.time = time;
     }
@@ -155,7 +155,7 @@ public class HackerNewsStory implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(title);
-        dest.writeInt(time);
+        dest.writeLong(time);
         dest.writeString(score);
         dest.writeString(descendants);
         dest.writeString(by);
