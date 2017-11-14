@@ -3,7 +3,6 @@ package com.wilson.hackernews.mvp;
 import android.util.Log;
 
 import com.wilson.hackernews.model.HackerNewsComment;
-import com.wilson.hackernews.model.HackerNewsStory;
 import com.wilson.hackernews.other.HackerNewsAPI;
 
 import java.util.ArrayList;
@@ -18,10 +17,10 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.wilson.hackernews.other.Constants.NUMBER_OF_STORIES_TO_DISPLAY;
+import static com.wilson.hackernews.other.Constants.NUMBER_OF_COMMENTS_TO_DISPLAY;
 
 /**
- * StoriesPresenter for MVP
+ * CommentsPresenter for MVP
  */
 
 public class HNCommentsPresenter<V> implements GetHackerNewsContract.CommentsPresenter {
@@ -32,17 +31,16 @@ public class HNCommentsPresenter<V> implements GetHackerNewsContract.CommentsPre
     private HackerNewsAPI apiService;
     private CompositeDisposable disposables;
 
-    private HackerNewsComment hackerNewsComment;
-    private List<HackerNewsStory> hackerNewsStoryList;
-    private String[] topStoriesID;
+    private String[] commentsID;
+    private List<HackerNewsComment> hackerNewsCommentsList;
 
     // range [0-topStoriesID.length)
-    private int numStoriesLoaded = 0;
+    private int numCommentsLoaded = 0;
 
     public HNCommentsPresenter(HackerNewsAPI apiService) {
         this.apiService = apiService;
         disposables = new CompositeDisposable();
-        hackerNewsStoryList = new ArrayList<>();
+        hackerNewsCommentsList = new ArrayList<>();
     }
 
     public void setView(V view){
@@ -51,84 +49,76 @@ public class HNCommentsPresenter<V> implements GetHackerNewsContract.CommentsPre
 
     @Override
     public void loadComments(String[] commentsID) {
-//        apiService.getItem(storyID)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(this.commentHandler, this.singleErrorHandler);
+        // Remove previous stories
+        this.commentsID = commentsID;
+        numCommentsLoaded = 0;
+        pullComments();
     }
 
     @Override
-    public void loadComment() {
-
+    public void loadMoreComments() {
+        pullComments();
     }
 
-    // Function to load individual story item
-    private void loadStories() {
-        // Remove previous stories
-        hackerNewsStoryList.clear();
-        ((GetHackerNewsContract.StoriesView) view).clearStories();
+    private void pullComments() {
+        hackerNewsCommentsList.clear();
 
-        // Counter to limit loading only 20 stories
+        // Counter to limit total stories to load
         int currentLoaded = 0;
-        int start = numStoriesLoaded;
-        List<String> storiesToPullList = new ArrayList<>();
+        int start = numCommentsLoaded;
+        List<String> commentsToPullList = new ArrayList<>();
 
-        while (numStoriesLoaded < topStoriesID.length) {
-            // Get story item from server.
-            storiesToPullList.add(topStoriesID[numStoriesLoaded]);
-            numStoriesLoaded++;
+        while (numCommentsLoaded < commentsID.length && currentLoaded < NUMBER_OF_COMMENTS_TO_DISPLAY) {
+            // Get comment item from server
+            commentsToPullList.add(commentsID[numCommentsLoaded]);
+            numCommentsLoaded++;
             currentLoaded++;
-            // Stop loading when 20 stories were loaded
-            if (currentLoaded == NUMBER_OF_STORIES_TO_DISPLAY) {
-                break;
-            }
         }
-
-        //String[] storiesToPull = new String[NUMBER_OF_STORIES_TO_DISPLAY];
-        //System.arraycopy(topStoriesID, start, storiesToPull, 0, numStoriesLoaded - start);
-        //List<String> storiesToPullList = new ArrayList<>(Arrays.asList(storiesToPull));
 
         // Use flatMap to ensure the order of items received
         // is same as the list (synchronized).
 
         // This makes the API call visibly slow. There could
         // be better way but stick with this method for now.
-        Single<List<HackerNewsStory>> storiesObservable = Observable.fromIterable(storiesToPullList)
-                .flatMap(new Function<String, Observable<HackerNewsStory>>() {
+        Single<List<HackerNewsComment>> commentsObservable = Observable.fromIterable(commentsToPullList)
+                .flatMap(new Function<String, Observable<HackerNewsComment>>() {
                     @Override
-                    public Observable<HackerNewsStory> apply(String id) throws Exception {
-                        Log.d(TAG, "apply: " + id);
-                        return apiService.getStory(id);
+                    public Observable<HackerNewsComment> apply(String id) throws Exception {
+                        //Log.d(TAG, "apply: " + id);
+                        return apiService.getComment(id);
                     }
                 }).toList();
 
-        storiesObservable
+        commentsObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(HNCommentsPresenter.this.loadStoriesHandler, HNCommentsPresenter.this.singleErrorHandler);
+                .subscribe(HNCommentsPresenter.this.loadCommentsHandler, HNCommentsPresenter.this.singleErrorHandler);
     }
-
-    private Consumer<HackerNewsComment> commentHandler = new Consumer<HackerNewsComment>() {
-        @Override
-        public void accept(HackerNewsComment comment) throws Exception {
-            hackerNewsComment = comment;
-        }
-    };
 
     private Consumer<Throwable> singleErrorHandler = new Consumer<Throwable>() {
         @Override
         public void accept(@NonNull Throwable throwable) throws Exception {
             Log.d(TAG, "error: " + throwable.getLocalizedMessage());
-            ((GetHackerNewsContract.StoriesView) view).onFecthStoriesError();
+            ((GetHackerNewsContract.CommentsView) view).onFecthStoriesError();
         }
     };
 
-    private Consumer<List<HackerNewsStory>> loadStoriesHandler = new Consumer<List<HackerNewsStory>>() {
+    private Consumer<List<HackerNewsComment>> loadCommentsHandler = new Consumer<List<HackerNewsComment>>() {
         @Override
-        public void accept(List<HackerNewsStory> hackerNewsStories) throws Exception {
-            hackerNewsStoryList.clear();
-            hackerNewsStoryList.addAll(hackerNewsStories);
-            ((GetHackerNewsContract.StoriesView) view).onFetchStoriesSuccess(hackerNewsStoryList);
+        public void accept(List<HackerNewsComment> hackerNewsComments) throws Exception {
+            hackerNewsCommentsList.clear();
+            hackerNewsCommentsList.addAll(hackerNewsComments);
+
+            if (hackerNewsCommentsList.size() > 0)
+                ((GetHackerNewsContract.CommentsView) view).onFetchCommentsSuccess(hackerNewsCommentsList);
+            else
+                ((GetHackerNewsContract.CommentsView) view).onFecthStoriesError();
+
+            Log.d(TAG, "numCommentsLoaded: " + numCommentsLoaded + " commentsID.length: " + commentsID.length);
+            if (numCommentsLoaded < commentsID.length)
+                ((GetHackerNewsContract.CommentsView) view).showLoadMore();
+            else
+                ((GetHackerNewsContract.CommentsView) view).hideLoadMore();
         }
     };
 }

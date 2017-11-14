@@ -19,7 +19,6 @@ import com.wilson.hackernews.adapter.CommentsAdapter;
 import com.wilson.hackernews.model.HackerNewsComment;
 import com.wilson.hackernews.mvp.GetHackerNewsContract;
 import com.wilson.hackernews.mvp.HNCommentsPresenter;
-import com.wilson.hackernews.other.MyApp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +30,7 @@ import butterknife.ButterKnife;
 
 import static com.wilson.hackernews.other.Constants.COMMENTS_FRAGMENT_ARGUMENT_KEY;
 
-public class CommentsFragment extends Fragment implements GetHackerNewsContract.CommentsView, View.OnClickListener {
+public class RepliesFragment extends Fragment implements GetHackerNewsContract.CommentsView, View.OnClickListener {
 
     private static final String TAG = "CommentsFragment";
     private CommentsAdapter commentsAdapter;
@@ -52,9 +51,9 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     @BindView(R.id.ll_empty_comments) LinearLayout emptyCommentsLL;
     @BindView(R.id.tv_load_more) TextView loadMoreTV;
 
-    public static CommentsFragment newInstance(String[] commentsID)
+    public static RepliesFragment newInstance(String[] commentsID)
     {
-        CommentsFragment f = new CommentsFragment();
+        RepliesFragment f = new RepliesFragment();
         Bundle args = new Bundle();
         args.putStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY, commentsID);
         //args.putParcelable(COMMENTS_FRAGMENT_ARGUMENT_KEY, story);
@@ -81,7 +80,7 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
         //commentsID = args.getParcelable(COMMENTS_FRAGMENT_ARGUMENT_KEY);
         commentsID = args.getStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY);
 
-        MyApp.getAppComponent().inject(this);
+        //MyApp.getAppComponent().inject(this);
         presenter.setView(this);
         presenter.loadComments(commentsID);
 

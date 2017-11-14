@@ -1,7 +1,9 @@
 package com.wilson.hackernews.adapter;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +22,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
     private List<HackerNewsComment> hackerNewsCommentsList;
     private Context context;
 
-    public CommentsAdapter(List<HackerNewsComment> hackerNewsCommentsList) {
-        this.hackerNewsCommentsList = hackerNewsCommentsList;
+    public CommentsAdapter() {
         context = MyApp.get().getApplicationContext();
     }
 
@@ -45,19 +46,33 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
 
         // Display the information
         holder.properties.setText(context.getString(R.string.comment_properties, byName, "1 hour"));
-        holder.content.setText(content);
 
-//        holder.comments.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d(TAG, "clicked!");
-//            }
-//        });
+        // Display comments with HTML entities
+        if (Build.VERSION.SDK_INT >= 24)
+            holder.content.setText(Html.fromHtml(content , Html.FROM_HTML_MODE_LEGACY));
+        else
+            holder.content.setText(Html.fromHtml(content));
+
+        // Display "View replies" if there are replies to this comment
+        // (showing only 1 level as stated in the requirement).
+        if (kids != null && kids.length > 0)
+            holder.viewReplies.setVisibility(View.VISIBLE);
+
+        holder.viewReplies.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "viewreplies clicked!");
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return hackerNewsCommentsList.size();
+    }
+
+    public void setComments(List<HackerNewsComment> hackerNewsCommentsList) {
+        this.hackerNewsCommentsList = hackerNewsCommentsList;
     }
 
     class HackerNewsCommentHolder extends RecyclerView.ViewHolder {
@@ -68,7 +83,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
 
         HackerNewsCommentHolder(View itemView) {
             super(itemView);
-            properties = (TextView) itemView.findViewById(R.id.tv_properties);
+            properties = (TextView) itemView.findViewById(R.id.tv_comment_properties);
             content = (TextView) itemView.findViewById(R.id.tv_comment_content);
             viewReplies = (TextView) itemView.findViewById(R.id.tv_view_replies);
         }

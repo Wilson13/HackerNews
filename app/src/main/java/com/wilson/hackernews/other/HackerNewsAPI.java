@@ -17,5 +17,5 @@ public interface HackerNewsAPI {
     Observable<HackerNewsStory> getStory(@Path("id") String id);
 
     @GET("item/{id}.json")
-    Observable<HackerNewsComment> getItem(@Path("id") String id);
+    Observable<HackerNewsComment> getComment(@Path("id") String id);
 }

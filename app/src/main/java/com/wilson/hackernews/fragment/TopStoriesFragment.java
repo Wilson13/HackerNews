@@ -34,25 +34,22 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
     private static final String TAG = "TopStoriesFragment";
     private TopStoriesAdapter topStoriesAdapter;
     private List<HackerNewsStory> hackerNewsStoryList = new ArrayList<>();
+    private TopStoriesListener delegate;
     private boolean moreStories = false;
-    private ShowCommentsListener delegate;
 
     // Interface to pass show comments event to parent MainActivity
-    public interface ShowCommentsListener {
+    public interface TopStoriesListener {
         void showComments(String[] commentsID);
     }
+
     @Inject
     HNStoriesPresenter presenter;
-    @BindView(R.id.srl_top_stories)
-    SwipeRefreshLayout topStoriesSRL;
-    @BindView(R.id.rv_top_stories)
-    RecyclerView topStoriesRV;
-    @BindView(R.id.tv_load_more)
-    TextView loadMoreTV;
-    @BindView(R.id.ll_stories)
-    LinearLayout storiesLL;
-    @BindView(R.id.ll_empty_stories)
-    LinearLayout emptyStoriesLL;
+
+    @BindView(R.id.srl_top_stories) SwipeRefreshLayout topStoriesSRL;
+    @BindView(R.id.rv_top_stories) RecyclerView topStoriesRV;
+    @BindView(R.id.tv_load_more) TextView loadMoreTV;
+    @BindView(R.id.ll_stories) LinearLayout storiesLL;
+    @BindView(R.id.ll_empty_stories) LinearLayout emptyStoriesLL;
 
     public static TopStoriesFragment newInstance()
     {
@@ -78,6 +75,7 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
         MyApp.getAppComponent().inject(this);
         presenter.setView(this);
         presenter.loadTopStoriesID();
+
         topStoriesSRL.setOnRefreshListener(this);
         topStoriesSRL.setRefreshing(true); // Show refreshing animation
 
@@ -85,7 +83,7 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
         topStoriesAdapter.setData(hackerNewsStoryList);
         topStoriesAdapter.setDelegate(this);
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         topStoriesRV.setLayoutManager(mLayoutManager);
         topStoriesRV.setAdapter(topStoriesAdapter);
         loadMoreTV.setOnClickListener(this);
@@ -106,10 +104,10 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            delegate = (ShowCommentsListener) context;
+            delegate = (TopStoriesListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement ShowCommentsListener");
+                    + " must implement TopStoriesListener");
         }
     }
 
@@ -122,7 +120,9 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
     @Override
     public void onClick(View v) {
         topStoriesSRL.setRefreshing(true);
-        topStoriesRV.getLayoutManager().scrollToPosition(0);
+        hackerNewsStoryList.clear();
+        topStoriesAdapter.notifyDataSetChanged();
+        hideLoadMore();
         presenter.loadMoreStories();
     }
 
@@ -133,9 +133,10 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
 
     @Override
     public void onFetchStoriesSuccess(List<HackerNewsStory> hackerNewsStoryList) {
-        Log.d(TAG, "onFetchStoriesSuccess: " + hackerNewsStoryList.size());
+        Log.d(TAG, "onFetchCommentsSuccess: " + hackerNewsStoryList.size());
         this.hackerNewsStoryList.clear();
         this.hackerNewsStoryList.addAll(hackerNewsStoryList);
+        Log.d(TAG, "hackerNewsStoryList: " + this.hackerNewsStoryList.size());
         topStoriesAdapter.notifyDataSetChanged();
         topStoriesSRL.setRefreshing(false);
         showStoriesLoaded();

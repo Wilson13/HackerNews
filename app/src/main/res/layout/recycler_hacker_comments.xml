@@ -38,6 +38,7 @@
             android:text="@string/dummy_comment_content"
             android:textSize="@dimen/small_size"
             android:textColor="@color/colorBlack"
+            android:autoLink="web"
             android:background="@android:color/transparent" />
 
         <TextView
@@ -48,7 +49,8 @@
             android:text="@string/comment_view_replies"
             android:textSize="@dimen/small_size"
             android:textColor="@color/colorPrimary"
-            android:background="@android:color/transparent" />
+            android:background="@android:color/transparent"
+            android:visibility="gone" />
 
     </LinearLayout>
 

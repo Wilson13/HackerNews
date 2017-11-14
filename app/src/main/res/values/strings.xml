@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">HackerNews</string>
+    <string name="text_load_more">Load more</string>
 
     <!-- Top Stories Fragment -->
+    <string name="title_top_stories">Top Stories</string>
     <string name="empty_top_stories">No stories loaded</string>
     <string name="empty_top_stories_msg">Please check your Internet connection and try again.</string>
     <string name="dummy_story_title">Waymo now testing its self-driving cars on public roads with no one at the wheel (techcrunch.com)</string>
@@ -9,8 +11,9 @@
     <string name="dummy_story_comments">441 comments</string>
     <string name="story_properties">%1$s points by %2$s</string>
     <string name="story_comments">%1$s comments</string>
-    <string name="story_load_more">Load more</string>
+
     <!-- Comments Fragment -->
+    <string name="title_comments">Comments</string>
     <string name="empty_comments">No comments loaded</string>
     <string name="empty_comments_msg">Please check your Internet connection and try again.</string>
     <string name="dummy_comment_properties">Contingencies 4 hours ago</string>

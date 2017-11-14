@@ -63,7 +63,7 @@ public class HNStoriesPresenter<V> implements GetHackerNewsContract.StoriesPrese
 
     @Override
     public void loadMoreStories() {
-        loadStories();
+        pullStories();
     }
 
     @Override
@@ -71,10 +71,10 @@ public class HNStoriesPresenter<V> implements GetHackerNewsContract.StoriesPrese
     }
 
     // Function to load NUMBER_OF_STORIES_TO_DISPLAY individual story item
-    private void loadStories() {
+    private void pullStories() {
         // Remove previous stories
         hackerNewsStoryList.clear();
-        ((GetHackerNewsContract.StoriesView) view).clearStories();
+        //((GetHackerNewsContract.StoriesView) view).clearStories();
 
         // Counter to limit total stories to load
         int currentLoaded = 0;
@@ -82,15 +82,11 @@ public class HNStoriesPresenter<V> implements GetHackerNewsContract.StoriesPrese
         List<String> storiesToPullList = new ArrayList<>();
 
         while (numStoriesLoaded < topStoriesID.length && currentLoaded < NUMBER_OF_STORIES_TO_DISPLAY) {
-            // Get story item from server.
+            // Get story item from server
             storiesToPullList.add(topStoriesID[numStoriesLoaded]);
             numStoriesLoaded++;
             currentLoaded++;
         }
-
-        //String[] storiesToPull = new String[NUMBER_OF_STORIES_TO_DISPLAY];
-        //System.arraycopy(topStoriesID, start, storiesToPull, 0, numStoriesLoaded - start);
-        //List<String> storiesToPullList = new ArrayList<>(Arrays.asList(storiesToPull));
 
         // Use flatMap to ensure the order of items received
         // is same as the list (synchronized).
@@ -116,7 +112,7 @@ public class HNStoriesPresenter<V> implements GetHackerNewsContract.StoriesPrese
         @Override
         public void accept(String[] topStories) throws Exception {
             topStoriesID = topStories;
-            loadStories();
+            pullStories();
         }
     };
 

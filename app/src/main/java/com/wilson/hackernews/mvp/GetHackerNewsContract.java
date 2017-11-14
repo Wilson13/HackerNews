@@ -1,5 +1,6 @@
 package com.wilson.hackernews.mvp;
 
+import com.wilson.hackernews.model.HackerNewsComment;
 import com.wilson.hackernews.model.HackerNewsStory;
 
 import java.util.List;
@@ -35,16 +36,20 @@ public interface GetHackerNewsContract {
 
         void clearStories();
 
-        void onFetchStoriesSuccess(List<HackerNewsStory> hackerNewsStoryList);
+        void onFetchCommentsSuccess(List<HackerNewsComment> hackerNewsCommentList);
 
         void onFecthStoriesError();
+
+        void showLoadMore();
+
+        void hideLoadMore();
     }
 
     interface CommentsPresenter {
 
         void loadComments(String[] commentsID);
 
-        void loadComment();
+        void loadMoreComments();
 
     }
 

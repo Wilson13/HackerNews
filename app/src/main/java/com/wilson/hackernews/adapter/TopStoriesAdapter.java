@@ -12,13 +12,12 @@ import com.wilson.hackernews.R;
 import com.wilson.hackernews.model.HackerNewsStory;
 import com.wilson.hackernews.other.MyApp;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.HackerNewsStoryHolder> {
 
     private static final String TAG = "TopStoriesAdapter";
-    private List<HackerNewsStory> hackerNewsStoryList = new ArrayList<>();
+    private List<HackerNewsStory> hackerNewsStoryList;
     private Context context;
     private CommentsClickedListener delegate;
 
@@ -34,6 +33,7 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
     public HackerNewsStoryHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View inflatedView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recycler_hacker_news_story, parent, false);
+        Log.d(TAG, "onCreateViewHolder");
         return new HackerNewsStoryHolder(inflatedView);
     }
 
@@ -68,8 +68,7 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
     }
 
     public void setData(List<HackerNewsStory> hackerNewsStoryList) {
-        this.hackerNewsStoryList.clear();
-        this.hackerNewsStoryList.addAll(hackerNewsStoryList);
+        this.hackerNewsStoryList = hackerNewsStoryList;
     }
 
     public void setDelegate(CommentsClickedListener delegate) {
