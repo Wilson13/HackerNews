@@ -10,7 +10,7 @@
     <string name="dummy_story_properties">850 points by lemiant 13 hours ago</string>
     <string name="dummy_story_comments">441 comments</string>
     <string name="story_properties">%1$s points by %2$s %3$s ago</string>
-    <string name="story_comments">%1$s comments</string>
+    <string name="story_comments">%1$s</string>
 
     <!-- Comments Fragment -->
     <string name="title_comments">Comments</string>
@@ -26,6 +26,9 @@ edit2: Why all the downvotes? Even the status page of OVH is down, do not tell m
     <string name="comment_view_replies">View replies</string>
     <string name="comment_properties">%1$s %2$s ago</string>
 
+    <!-- Replies Fragment -->
     <string name="title_replies">Replies</string>
+    <string name="empty_replies">No replies loaded</string>
+    <string name="empty_replies_msg">Please check your Internet connection and try again.</string>
 
 </resources>

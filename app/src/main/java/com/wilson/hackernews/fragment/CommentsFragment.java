@@ -70,17 +70,6 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
 
         Bundle args = getArguments();
         commentsID = args.getStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY);
-
-//        if (savedInstanceState != null) {
-//            ArrayList<HackerNewsComment> savedList = args.getParcelable("COMMENTS_FRAGMENT_PARCELABLE_COMMENTS");
-//
-//            // Obtain saved Comments ArrayList (orientation changes)
-//            if (savedList != null) {
-//                hackerNewsCommentList.clear();
-//                hackerNewsCommentList.addAll(savedList);
-//                Log.d(TAG, "hackerNewsCommentList.size(): " + hackerNewsCommentList.size());
-//            }
-//        }
         return v;
     }
 
@@ -110,13 +99,6 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        Log.d(TAG, "onSaveInstanceState");
-        outState.putParcelableArrayList("COMMENTS_FRAGMENT_PARCELABLE_COMMENTS", new ArrayList<>(hackerNewsCommentList));
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
@@ -130,6 +112,9 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     @Override
     public void onClick(View v) {
         commentsSRL.setRefreshing(true);
+        hackerNewsCommentList.clear();
+        commentsAdapter.notifyDataSetChanged();
+        hideLoadMore();
         presenter.loadMoreComments();
     }
 
@@ -156,7 +141,7 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
 
     @Override
     public void hideLoadMore() {
-        loadMoreTV.setVisibility(View.INVISIBLE);
+        loadMoreTV.setVisibility(View.GONE);
     }
 
     @Override

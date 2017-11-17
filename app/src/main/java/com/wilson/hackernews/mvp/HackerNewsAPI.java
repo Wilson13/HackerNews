@@ -1,4 +1,4 @@
-package com.wilson.hackernews.other;
+package com.wilson.hackernews.mvp;
 
 import com.wilson.hackernews.model.HackerNewsComment;
 import com.wilson.hackernews.model.HackerNewsStory;

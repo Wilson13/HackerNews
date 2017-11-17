@@ -1,6 +1,8 @@
 package com.wilson.hackernews.fragment;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -68,16 +70,9 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (savedInstanceState != null) {
-            return;
-        }
-
         MyApp.getAppComponent().inject(this);
         presenter.setView(this);
-        presenter.loadTopStoriesID();
-
         topStoriesSRL.setOnRefreshListener(this);
-        topStoriesSRL.setRefreshing(true); // Show refreshing animation
 
         topStoriesAdapter = new TopStoriesAdapter();
         topStoriesAdapter.setData(hackerNewsStoryList);
@@ -103,7 +98,10 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
     @Override
     public void onRefresh() {
         Log.d(TAG, "onRefresh()");
-        presenter.loadTopStoriesID();
+        hackerNewsStoryList.clear();
+        topStoriesAdapter.notifyDataSetChanged();
+        hideLoadMore();
+        presenter.loadNewStories();
     }
 
     @Override
@@ -116,8 +114,8 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
     }
 
     @Override
-    public void clearStories() {
-        hackerNewsStoryList.clear();
+    public void onFetchStoriesStart() {
+        topStoriesSRL.setRefreshing(true); // Show refreshing animation
     }
 
     @Override
@@ -145,6 +143,15 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
     @Override
     public void hideLoadMore() {
         loadMoreTV.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void storyClicked(String url) {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        // Prevent crashes from implicit intent
+        if (i.resolveActivity(getActivity().getPackageManager()) != null)
+            getActivity().startActivity(i);
     }
 
     @Override

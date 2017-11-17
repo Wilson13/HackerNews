@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.wilson.hackernews.R;
 import com.wilson.hackernews.model.HackerNewsStory;
 import com.wilson.hackernews.other.MyApp;
+import com.wilson.hackernews.other.Utils;
 
 import java.util.List;
 
@@ -23,6 +24,8 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
 
     // Interface to pass comments click event to parent TopStoriesFragment
     public interface CommentsClickedListener {
+        void storyClicked(String url);
+
         void commentsClicked(String[] commentsID);
     }
 
@@ -42,49 +45,19 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
     public void onBindViewHolder(HackerNewsStoryHolder holder, int position) {
         // Get story from HackerNews story list
         HackerNewsStory currentItem = hackerNewsStoryList.get(position);
-        Log.d(TAG, "onBindViewHolder currentItem: " + currentItem.getTitle());
 
-        String title = currentItem.getTitle();
+        final String title = currentItem.getTitle();
         String score = currentItem.getScore();
         String byName = currentItem.getBy();
-        String comments = currentItem.getDescendants();
-        final String[] kids = currentItem.getKids();
+        int numComments = currentItem.getDescendants();
 
-        String timeCommented ="";
-        long time = currentItem.getTime();
-        long currentTime = System.currentTimeMillis() / 1000;
-
-        Log.d(TAG, "time: " + time);
-        Log.d(TAG, "currentTime: " + currentTime);
-        long commentedTime = currentTime - time;
-
-        if (commentedTime > (60 * 60)) {
-            long commentTimeHour = commentedTime / (60 * 60);
-
-            if (commentTimeHour > 1)
-                timeCommented = commentTimeHour + " hours";
-            else
-                timeCommented = commentTimeHour + " hour";
-
-        } else if (commentedTime > (60)) {
-            timeCommented = commentedTime / (60) + " mins";
-        } else if (commentedTime > (1000)) {
-            timeCommented = commentedTime + " secs";
-        } else {
-            timeCommented = 0 + " sec";
-        }
+        // Unix time is in seconds
+        String timePosted = Utils.getElapsedTime(currentItem.getTime(), System.currentTimeMillis() / 1000);
 
         // Display the information
         holder.title.setText(title);
-        holder.properties.setText(context.getString(R.string.story_properties, score, byName, timeCommented));
-        holder.comments.setText(context.getString(R.string.story_comments, comments));
-        holder.comments.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (delegate != null)
-                    delegate.commentsClicked(kids);
-            }
-        });
+        holder.properties.setText(context.getString(R.string.story_properties, score, byName, timePosted));
+        holder.comments.setText(numComments > 1 ? numComments + " comments" : numComments + " comment");
     }
 
     @Override
@@ -100,7 +73,7 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
         this.delegate = delegate;
     }
 
-    class HackerNewsStoryHolder extends RecyclerView.ViewHolder {
+    class HackerNewsStoryHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView title;
         TextView properties;
@@ -111,6 +84,38 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
             title = (TextView) itemView.findViewById(R.id.tv_title);
             properties = (TextView) itemView.findViewById(R.id.tv_properties);
             comments = (TextView) itemView.findViewById(R.id.tv_comments);
+            comments.setOnClickListener(this);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            // onBindViewHolder() is called for each and every item and setting the click listener
+            // is an unnecessary option to repeat when we call it once in the ViewHolder constructor.
+            // https://stackoverflow.com/questions/33845846/why-is-adding-an-onclicklistener-inside-onbindviewholder-of-a-recyclerview-adapt
+
+            HackerNewsStory currentItem = hackerNewsStoryList.get(getAdapterPosition());
+            int numComments = currentItem.getDescendants();
+            String[] kids = currentItem.getKids();
+            String url = currentItem.getUrl();
+
+            // Handle click on comments
+            if (v.getId() == R.id.tv_comments) {
+                if (delegate != null && numComments > 0) {
+                    Log.d(TAG, "title: " + title + " kids size: " + kids.length);
+                    delegate.commentsClicked(kids);
+                }
+            }
+            // Handle click on RecyclerView item
+            else {
+                // In case URL doesn't start with http or https
+                if (!url.startsWith("http://") && !url.startsWith("https://"))
+                    url = "http://" + url;
+
+                if (delegate != null) {
+                    delegate.storyClicked(url);
+                }
+            }
         }
     }
 }

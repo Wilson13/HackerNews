@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.wilson.hackernews.R;
 import com.wilson.hackernews.model.HackerNewsComment;
 import com.wilson.hackernews.other.MyApp;
+import com.wilson.hackernews.other.Utils;
 
 import java.util.List;
 
@@ -49,8 +50,10 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.HackerNe
         String byName = currentItem.getBy();
         long time = currentItem.getTime();
 
+        // Unix time is in seconds
+        String timeReplied = Utils.getElapsedTime(time, System.currentTimeMillis() / 1000);
         // Display the information
-        holder.properties.setText(context.getString(R.string.comment_properties, byName, "1 hour"));
+        holder.properties.setText(context.getString(R.string.comment_properties, byName, timeReplied));
 
         // Display comments with HTML entities
         if (Build.VERSION.SDK_INT >= 24)

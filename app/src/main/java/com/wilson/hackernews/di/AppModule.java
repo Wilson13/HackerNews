@@ -4,7 +4,8 @@ import android.app.Application;
 
 import com.wilson.hackernews.mvp.HNStoriesPresenter;
 import com.wilson.hackernews.mvp.HNCommentsPresenter;
-import com.wilson.hackernews.other.HackerNewsAPI;
+import com.wilson.hackernews.mvp.HackerNewsAPI;
+import com.wilson.hackernews.mvp.HackerNewsAPIDataSource;
 import com.wilson.hackernews.other.RetrofitSingleton;
 
 import dagger.Module;
@@ -27,8 +28,8 @@ public class AppModule {
     }
 
     @Provides
-    HNStoriesPresenter providesPresenter(HackerNewsAPI apiService) {
-        return new HNStoriesPresenter(apiService);
+    HNStoriesPresenter providesPresenter(HackerNewsAPIDataSource dataSource) {
+        return new HNStoriesPresenter(dataSource);
     }
 
     @Provides
@@ -39,6 +40,11 @@ public class AppModule {
     @Provides
     HackerNewsAPI providesHackerNewsAPI() {
         return RetrofitSingleton.getClient(HACKER_NEWS_BASE_URL).create(HackerNewsAPI.class);
+    }
+
+    @Provides
+    HackerNewsAPIDataSource providesHackerNewsAPIDataSource(HackerNewsAPI apiService) {
+        return new HackerNewsAPIDataSource(apiService);
     }
 
 //    @Binds

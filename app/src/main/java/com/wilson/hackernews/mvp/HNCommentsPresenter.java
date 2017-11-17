@@ -3,7 +3,6 @@ package com.wilson.hackernews.mvp;
 import android.util.Log;
 
 import com.wilson.hackernews.model.HackerNewsComment;
-import com.wilson.hackernews.other.HackerNewsAPI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +10,8 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.wilson.hackernews.other.Constants.NUMBER_OF_COMMENTS_TO_DISPLAY;
@@ -27,7 +24,7 @@ public class HNCommentsPresenter<V> implements GetHackerNewsContract.CommentsPre
 
     private static final String TAG = "HNCommentsPresenter";
 
-    private V view;
+    private GetHackerNewsContract.CommentsView view;
     private HackerNewsAPI apiService;
     private CompositeDisposable disposables;
 
@@ -44,7 +41,7 @@ public class HNCommentsPresenter<V> implements GetHackerNewsContract.CommentsPre
     }
 
     public void setView(V view){
-        this.view = view;
+        this.view = (GetHackerNewsContract.CommentsView) view;
     }
 
     @Override
@@ -81,27 +78,16 @@ public class HNCommentsPresenter<V> implements GetHackerNewsContract.CommentsPre
         // This makes the API call visibly slow. There could
         // be better way but stick with this method for now.
         Single<List<HackerNewsComment>> commentsObservable = Observable.fromIterable(commentsToPullList)
-                .flatMap(new Function<String, Observable<HackerNewsComment>>() {
-                    @Override
-                    public Observable<HackerNewsComment> apply(String id) throws Exception {
-                        //Log.d(TAG, "apply: " + id);
-                        return apiService.getComment(id);
-                    }
+                .flatMap(id -> {
+                    //Log.d(TAG, "apply: " + id);
+                    return apiService.getComment(id);
                 }).toList();
 
         commentsObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(HNCommentsPresenter.this.loadCommentsHandler, HNCommentsPresenter.this.singleErrorHandler);
+                .subscribe(HNCommentsPresenter.this.loadCommentsHandler, error -> view.onFecthStoriesError());
     }
-
-    private Consumer<Throwable> singleErrorHandler = new Consumer<Throwable>() {
-        @Override
-        public void accept(@NonNull Throwable throwable) throws Exception {
-            Log.d(TAG, "error: " + throwable.getLocalizedMessage());
-            ((GetHackerNewsContract.CommentsView) view).onFecthStoriesError();
-        }
-    };
 
     private Consumer<List<HackerNewsComment>> loadCommentsHandler = new Consumer<List<HackerNewsComment>>() {
         @Override
@@ -110,15 +96,15 @@ public class HNCommentsPresenter<V> implements GetHackerNewsContract.CommentsPre
             hackerNewsCommentsList.addAll(hackerNewsComments);
 
             if (hackerNewsCommentsList.size() > 0)
-                ((GetHackerNewsContract.CommentsView) view).onFetchCommentsSuccess(hackerNewsCommentsList);
+                view.onFetchCommentsSuccess(hackerNewsCommentsList);
             else
-                ((GetHackerNewsContract.CommentsView) view).onFecthStoriesError();
+                view.onFecthStoriesError();
 
             Log.d(TAG, "numCommentsLoaded: " + numCommentsLoaded + " commentsID.length: " + commentsID.length);
             if (numCommentsLoaded < commentsID.length)
-                ((GetHackerNewsContract.CommentsView) view).showLoadMore();
+                view.showLoadMore();
             else
-                ((GetHackerNewsContract.CommentsView) view).hideLoadMore();
+                view.hideLoadMore();
         }
     };
 }

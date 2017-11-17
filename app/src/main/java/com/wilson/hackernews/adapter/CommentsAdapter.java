@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.wilson.hackernews.R;
 import com.wilson.hackernews.model.HackerNewsComment;
 import com.wilson.hackernews.other.MyApp;
+import com.wilson.hackernews.other.Utils;
 
 import java.util.List;
 
@@ -50,14 +51,19 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
         final String[] kids = currentItem.getKids();
         long time = currentItem.getTime();
 
+        // Unix time is in seconds
+        String timeCommented = Utils.getElapsedTime(time, System.currentTimeMillis() / 1000);
+
         // Display the information
-        holder.properties.setText(context.getString(R.string.comment_properties, byName, "1 hour"));
+        holder.properties.setText(context.getString(R.string.comment_properties, byName, timeCommented));
 
         // Display comments with HTML entities
-        if (Build.VERSION.SDK_INT >= 24)
-            holder.content.setText(Html.fromHtml(content , Html.FROM_HTML_MODE_LEGACY));
-        else
-            holder.content.setText(Html.fromHtml(content));
+        if (content != null) {
+            if (Build.VERSION.SDK_INT >= 24)
+                holder.content.setText(Html.fromHtml(content, Html.FROM_HTML_MODE_LEGACY));
+            else
+                holder.content.setText(Html.fromHtml(content));
+        }
 
         // Display "View replies" if there are replies to this comment
         // (showing only 1 level as stated in the requirement).

@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.crashlytics.android.Crashlytics;
 import com.wilson.hackernews.R;
 import com.wilson.hackernews.fragment.CommentsFragment;
 import com.wilson.hackernews.fragment.RepliesFragment;
@@ -17,6 +18,7 @@ import com.wilson.hackernews.other.MyApp;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity implements TopStoriesFragment.TopStoriesListener, CommentsFragment.CommentsListener, FragmentManager.OnBackStackChangedListener {
 
@@ -26,8 +28,8 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
-
         ButterKnife.bind(this);
         MyApp.getAppComponent().inject(this);
 
@@ -45,7 +47,9 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
                 Log.d("MainActivity", "savedInstanceState == null");
                 showTopStories();
             } else {
-                Log.d("MainActivity", "savedInstanceState != null: " + getFragmentManager().getBackStackEntryCount());
+                Log.d("MainActivity", "savedInstanceState != null");
+                changeTitle();
+                return;
             }
         }
     }
@@ -123,7 +127,16 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
         Fragment displayFragment = getSupportFragmentManager().findFragmentById(R.id.fl_main);
 
         // Set correct title
-        if (displayFragment instanceof CommentsFragment)
+        changeTitle();
+    }
+
+    private void changeTitle() {
+        Fragment displayFragment = getSupportFragmentManager().findFragmentById(R.id.fl_main);
+
+        // Set correct title
+        if (displayFragment instanceof TopStoriesFragment)
+            getSupportActionBar().setTitle(R.string.title_top_stories);
+        else if (displayFragment instanceof CommentsFragment)
             getSupportActionBar().setTitle(R.string.title_comments);
         else if (displayFragment instanceof TopStoriesFragment)
             getSupportActionBar().setTitle(R.string.title_top_stories);

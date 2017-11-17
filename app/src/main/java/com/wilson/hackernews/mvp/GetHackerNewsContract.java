@@ -12,7 +12,7 @@ public interface GetHackerNewsContract {
 
     interface StoriesView {
 
-        void clearStories();
+        void onFetchStoriesStart();
 
         void onFetchStoriesSuccess(List<HackerNewsStory> hackerNewsStoryList);
 
@@ -25,11 +25,10 @@ public interface GetHackerNewsContract {
 
     interface StoriesPresenter {
 
-        void loadTopStoriesID();
+        void loadNewStories();
 
         void loadMoreStories();
 
-        void onDestroy();
     }
 
     interface CommentsView {

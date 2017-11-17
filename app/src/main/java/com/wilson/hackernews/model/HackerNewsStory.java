@@ -16,7 +16,7 @@ public class HackerNewsStory implements Parcelable {
 
     private String score;
 
-    private String descendants;
+    private int descendants;
 
     private String by;
 
@@ -26,12 +26,12 @@ public class HackerNewsStory implements Parcelable {
 
     private String url;
 
-    protected HackerNewsStory(Parcel in) {
+    public HackerNewsStory(Parcel in) {
         id = in.readString();
         title = in.readString();
         time = in.readInt();
         score = in.readString();
-        descendants = in.readString();
+        descendants = in.readInt();
         by = in.readString();
         kids = in.createStringArray();
         type = in.readString();
@@ -90,12 +90,12 @@ public class HackerNewsStory implements Parcelable {
         this.score = score;
     }
 
-    public String getDescendants ()
+    public int getDescendants ()
     {
         return descendants;
     }
 
-    public void setDescendants (String descendants)
+    public void setDescendants (int descendants)
     {
         this.descendants = descendants;
     }
@@ -157,7 +157,7 @@ public class HackerNewsStory implements Parcelable {
         dest.writeString(title);
         dest.writeLong(time);
         dest.writeString(score);
-        dest.writeString(descendants);
+        dest.writeInt(descendants);
         dest.writeString(by);
         dest.writeStringArray(kids);
         dest.writeString(type);

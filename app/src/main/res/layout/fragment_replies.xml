@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cl_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/srl_replies"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?attr/actionBarSize">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/ll_replies"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/rv_replies"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="9" />
+
+                    <TextView
+                        android:id="@+id/tv_load_more"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:textColor="@color/colorPrimary"
+                        android:text="@string/text_load_more"
+                        android:visibility="invisible" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_empty_replies"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_book"
+                        android:layout_marginBottom="35dp"
+                        android:tint="@color/colorHint" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/empty_replies"
+                        android:textSize="@dimen/normal_size"
+                        android:textColor="@color/colorBlack" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:text="@string/empty_replies_msg"
+                        android:textSize="@dimen/small_size"
+                        android:textColor="@color/colorHintDark" />
+                </LinearLayout>
+            </RelativeLayout>
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+</android.support.constraint.ConstraintLayout>

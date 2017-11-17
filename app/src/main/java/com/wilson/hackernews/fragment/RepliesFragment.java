@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,29 +27,34 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.wilson.hackernews.other.Constants.COMMENTS_FRAGMENT_ARGUMENT_KEY;
+import static com.wilson.hackernews.other.Constants.REPLIES_FRAGMENT_ARGUMENT_KEY;
+
+/**
+ * Uses same View (CommentsView), Presenter (HNCommentsPresenter), and
+ * Model (HackerNewsComment) as CommentsFragment since they load same item type.
+ */
 
 public class RepliesFragment extends Fragment implements GetHackerNewsContract.CommentsView, View.OnClickListener {
 
-    private static final String TAG = "CommentsFragment";
+    private static final String TAG = "RepliesFragment";
     private RepliesAdapter repliesAdapter;
-    private List<HackerNewsComment> hackerNewsCommentList = new ArrayList<>();
+    private List<HackerNewsComment> hackerNewsRepliesList = new ArrayList<>();
     private String[] repliesID;
 
     @Inject
     HNCommentsPresenter presenter;
 
-    @BindView(R.id.srl_comments) SwipeRefreshLayout commentsSRL;
-    @BindView(R.id.rv_comments) RecyclerView commentsRV;
-    @BindView(R.id.ll_comments) LinearLayout commentsLL;
-    @BindView(R.id.ll_empty_comments) LinearLayout emptyCommentsLL;
+    @BindView(R.id.srl_replies) SwipeRefreshLayout repliesSRL;
+    @BindView(R.id.rv_replies) RecyclerView repliesRV;
+    @BindView(R.id.ll_replies) LinearLayout repliesLL;
+    @BindView(R.id.ll_empty_replies) LinearLayout emptyRepliesLL;
     @BindView(R.id.tv_load_more) TextView loadMoreTV;
 
     public static RepliesFragment newInstance(String[] repliesID)
     {
         RepliesFragment f = new RepliesFragment();
         Bundle args = new Bundle();
-        args.putStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY, repliesID);
+        args.putStringArray(REPLIES_FRAGMENT_ARGUMENT_KEY, repliesID);
         f.setArguments(args);
         return f;
     }
@@ -58,7 +62,7 @@ public class RepliesFragment extends Fragment implements GetHackerNewsContract.C
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_comments, container, false);
+        View v = inflater.inflate(R.layout.fragment_replies, container, false);
         ButterKnife.bind(this, v);
         return v;
     }
@@ -67,47 +71,45 @@ public class RepliesFragment extends Fragment implements GetHackerNewsContract.C
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (savedInstanceState != null) {
-            return;
-        }
         Bundle args = getArguments();
-        //repliesID = args.getParcelable(COMMENTS_FRAGMENT_ARGUMENT_KEY);
-        repliesID = args.getStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY);
+        repliesID = args.getStringArray(REPLIES_FRAGMENT_ARGUMENT_KEY);
 
         MyApp.getAppComponent().inject(this);
         presenter.setView(this);
         presenter.loadComments(repliesID);
 
-        commentsSRL.setEnabled(false); // Disable refresh function
-        commentsSRL.setRefreshing(true); // Show refreshing animation
+        repliesSRL.setEnabled(false); // Disable refresh function
+        repliesSRL.setRefreshing(true); // Show refreshing animation
         repliesAdapter = new RepliesAdapter();
-        repliesAdapter.setComments(hackerNewsCommentList);
+        repliesAdapter.setComments(hackerNewsRepliesList);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-        commentsRV.setLayoutManager(mLayoutManager);
-        commentsRV.setAdapter(repliesAdapter);
+        repliesRV.setLayoutManager(mLayoutManager);
+        repliesRV.setAdapter(repliesAdapter);
         loadMoreTV.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        commentsSRL.setRefreshing(true);
+        repliesSRL.setRefreshing(true);
+        hackerNewsRepliesList.clear();
+        repliesAdapter.notifyDataSetChanged();
+        hideLoadMore();
         presenter.loadMoreComments();
     }
 
     @Override
     public void onFetchCommentsSuccess(List<HackerNewsComment> hackerNewsCommentList) {
-        Log.d(TAG, "onFetchCommentsSuccess: " + hackerNewsCommentList.size());
-        this.hackerNewsCommentList.clear();
-        this.hackerNewsCommentList.addAll(hackerNewsCommentList);
+        this.hackerNewsRepliesList.clear();
+        this.hackerNewsRepliesList.addAll(hackerNewsCommentList);
         repliesAdapter.notifyDataSetChanged();
-        commentsSRL.setRefreshing(false);
+        repliesSRL.setRefreshing(false);
         showStoriesLoaded();
     }
 
     @Override
     public void onFecthStoriesError() {
-        commentsSRL.setRefreshing(false);
+        repliesSRL.setRefreshing(false);
         showStoriesEmpty();
     }
 
@@ -118,16 +120,16 @@ public class RepliesFragment extends Fragment implements GetHackerNewsContract.C
 
     @Override
     public void hideLoadMore() {
-        loadMoreTV.setVisibility(View.INVISIBLE);
+        loadMoreTV.setVisibility(View.GONE);
     }
 
     private void showStoriesEmpty() {
-        commentsLL.setVisibility(View.GONE);
-        emptyCommentsLL.setVisibility(View.VISIBLE);
+        repliesLL.setVisibility(View.GONE);
+        emptyRepliesLL.setVisibility(View.VISIBLE);
     }
 
     private void showStoriesLoaded() {
-        commentsLL.setVisibility(View.VISIBLE);
-        emptyCommentsLL.setVisibility(View.GONE);
+        repliesLL.setVisibility(View.VISIBLE);
+        emptyRepliesLL.setVisibility(View.GONE);
     }
 }
