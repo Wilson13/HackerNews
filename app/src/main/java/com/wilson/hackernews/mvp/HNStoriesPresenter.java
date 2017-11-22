@@ -19,11 +19,11 @@ public class HNStoriesPresenter<V> implements GetHackerNewsContract.StoriesPrese
     private static final String TAG = "HNStoriesPresenter";
 
     private GetHackerNewsContract.StoriesView view;
-    private HackerNewsAPIDataSource dataSource;
+    private HackerNewsModel dataSource;
     private String[] topStoriesID;
     private int numStoriesLoaded = 0; // range [0-topStoriesID.length)
 
-    public HNStoriesPresenter(HackerNewsAPIDataSource dataSource) {
+    public HNStoriesPresenter(HackerNewsModel dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -65,15 +65,14 @@ public class HNStoriesPresenter<V> implements GetHackerNewsContract.StoriesPrese
 
         // Load NUMBER_OF_STORIES_TO_DISPLAY individual story item
         dataSource.getStories(storiesToPullList)
-            //.subscribeOn(Schedulers.io())
-            //.observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe(hackerNewsStories -> storiesLoadedHandler(hackerNewsStories),
                     error -> view.onFecthStoriesError()
             );
     }
 
     private void storiesLoadedHandler(List<HackerNewsStory> hackerNewsStories) {
-
         view.onFetchStoriesSuccess(hackerNewsStories);
         if (numStoriesLoaded < topStoriesID.length)
             view.showLoadMore();

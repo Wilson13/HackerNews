@@ -2,10 +2,10 @@ package com.wilson.hackernews.di;
 
 import android.app.Application;
 
-import com.wilson.hackernews.mvp.HNStoriesPresenter;
+import com.wilson.hackernews.mvp.HackerNewsModel;
+import com.wilson.hackernews.mvp.GetHackerNewsContract;
 import com.wilson.hackernews.mvp.HNCommentsPresenter;
-import com.wilson.hackernews.mvp.HackerNewsAPI;
-import com.wilson.hackernews.mvp.HackerNewsAPIDataSource;
+import com.wilson.hackernews.mvp.HNStoriesPresenter;
 import com.wilson.hackernews.other.RetrofitSingleton;
 
 import dagger.Module;
@@ -28,23 +28,23 @@ public class AppModule {
     }
 
     @Provides
-    HNStoriesPresenter providesPresenter(HackerNewsAPIDataSource dataSource) {
+    HNStoriesPresenter providesPresenter(HackerNewsModel dataSource) {
         return new HNStoriesPresenter(dataSource);
     }
 
     @Provides
-    HNCommentsPresenter providesCommentsPresenter(HackerNewsAPI apiService) {
-        return new HNCommentsPresenter(apiService);
+    HNCommentsPresenter providesCommentsPresenter(HackerNewsModel dataSource) {
+        return new HNCommentsPresenter(dataSource);
     }
 
     @Provides
-    HackerNewsAPI providesHackerNewsAPI() {
-        return RetrofitSingleton.getClient(HACKER_NEWS_BASE_URL).create(HackerNewsAPI.class);
+    GetHackerNewsContract.APIModel providesHackerNewsAPI() {
+        return RetrofitSingleton.getClient(HACKER_NEWS_BASE_URL).create(GetHackerNewsContract.APIModel.class);
     }
 
     @Provides
-    HackerNewsAPIDataSource providesHackerNewsAPIDataSource(HackerNewsAPI apiService) {
-        return new HackerNewsAPIDataSource(apiService);
+    HackerNewsModel providesHackerNewsAPIDataSource(GetHackerNewsContract.APIModel apiService) {
+        return new HackerNewsModel(apiService);
     }
 
 //    @Binds

@@ -1,40 +1,30 @@
 package com.wilson.hackernews.other;
 
-public class Utils {
+import static com.wilson.hackernews.other.Constants.NUM_SECONDS_HOUR;
+import static com.wilson.hackernews.other.Constants.NUM_SECONDS_MINUTE;
 
-    private static final int NUM_SECONDS_HOUR = 60 * 60;
-    private static final int NUM_SECONDS_MINUTE = 60;
+public class Utils {
 
     public static String getElapsedTime(long timeCommented, long currentTime) {
 
         String elapsedTime = "";
         long commentedTime = currentTime - timeCommented;
+        long commentTimeHour;
+        long commentTimeMin;
 
         // If elapsedTime is more than an hour
-        if (commentedTime > NUM_SECONDS_HOUR) {
-
-            long commentTimeHour = commentedTime / NUM_SECONDS_HOUR;
-            elapsedTime = commentTimeHour + " hour";
-
-            if (commentTimeHour > 1)
-                elapsedTime = commentTimeHour + " hours";
+        if (commentedTime >= NUM_SECONDS_HOUR) {
+            commentTimeHour = commentedTime / NUM_SECONDS_HOUR;
+            elapsedTime = commentTimeHour > 1 ? commentTimeHour + " hours" : commentTimeHour + " hour";
         }
         // If elapsedTime is more than a minute
-        else if (commentedTime > NUM_SECONDS_MINUTE) {
-
-            long commentTimeMin = commentedTime / NUM_SECONDS_MINUTE;
-            elapsedTime = commentedTime + " min";
-
-            if (commentTimeMin > 1)
-                elapsedTime = commentTimeMin + " mins";
+        else if (commentedTime >= NUM_SECONDS_MINUTE) {
+            commentTimeMin = commentedTime / NUM_SECONDS_MINUTE;
+            elapsedTime = commentTimeMin > 1 ? commentTimeMin + " mins" : commentTimeMin + " min";
         }
-        // If elapsedTime is more than a second
-        else if (commentedTime > (1)) {
-            elapsedTime = commentedTime + " secs";
-        }
-        // If elapsedTime is more less than a second (just now)
+        // If elapsedTime is in seconds
         else {
-            elapsedTime = 0 + " sec";
+            elapsedTime = commentedTime > 1 ? commentedTime + " secs" : "1 sec";
         }
         return elapsedTime;
     }
