@@ -45,11 +45,11 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
     }
 
     @Inject
-    HNStoriesPresenter presenter;
+    public HNStoriesPresenter presenter;
 
     @BindView(R.id.srl_top_stories) SwipeRefreshLayout topStoriesSRL;
     @BindView(R.id.rv_top_stories) RecyclerView topStoriesRV;
-    @BindView(R.id.tv_load_more) TextView loadMoreTV;
+    @BindView(R.id.tv_load_more_stories) TextView loadMoreTV;
     @BindView(R.id.ll_stories) LinearLayout storiesLL;
     @BindView(R.id.ll_empty_stories) LinearLayout emptyStoriesLL;
 
@@ -74,9 +74,8 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
         presenter.setView(this);
         topStoriesSRL.setOnRefreshListener(this);
 
-        topStoriesAdapter = new TopStoriesAdapter();
+        topStoriesAdapter = new TopStoriesAdapter(this);
         topStoriesAdapter.setData(hackerNewsStoryList);
-        topStoriesAdapter.setDelegate(this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         topStoriesRV.setLayoutManager(mLayoutManager);
@@ -156,7 +155,7 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
 
     @Override
     public void commentsClicked(String[] commentsID) {
-        if (delegate != null)
+        //if (delegate != null) // Removed for code coverage, not possible to encounter null too.
             delegate.showComments(commentsID);
     }
 

@@ -37,8 +37,7 @@ public class HNStoriesPresenterTest {
     @Mock
     private HackerNewsModel dataSource;
     @InjectMocks
-    private
-    HNStoriesPresenter presenter = new HNStoriesPresenter(dataSource);
+    private HNStoriesPresenter presenter = new HNStoriesPresenter(dataSource);
 
     private String storyID;
     private String storyID2;

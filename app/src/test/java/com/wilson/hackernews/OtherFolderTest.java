@@ -15,6 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import retrofit2.Retrofit;
 
 import static com.wilson.hackernews.other.Constants.HACKER_NEWS_BASE_URL;
+import static com.wilson.hackernews.other.Utils.getCorrectURL;
 import static com.wilson.hackernews.other.Utils.getElapsedTime;
 import static org.hamcrest.CoreMatchers.instanceOf;
 
@@ -66,5 +67,12 @@ public class OtherFolderTest {
 
         // Test 2 minutes
         Assert.assertEquals("2 secs", getElapsedTime(twoSescAgo, currentTime));
+    }
+
+    @Test
+    public void UtilsGetCorrectURL() {
+        String correctURL = "http://google.com";
+        String url = "google.com";
+        Assert.assertEquals(correctURL, getCorrectURL(url));
     }
 }

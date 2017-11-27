@@ -29,4 +29,11 @@ public class Utils {
         return elapsedTime;
     }
 
+    public static String getCorrectURL(String url) {
+        if (!url.startsWith("http://") && !url.startsWith("https://"))
+            return "http://" + url;
+        else
+            return url;
+    }
+
 }

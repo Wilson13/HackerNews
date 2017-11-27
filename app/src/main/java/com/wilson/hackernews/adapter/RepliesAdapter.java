@@ -22,12 +22,6 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.HackerNe
     private static final String TAG = "CommentsAdapter";
     private List<HackerNewsComment> hackerNewsCommentsList;
     private Context context;
-    private RepliesClickedListener delegate;
-
-    // Interface to pass repplies click event to parent CommentsFragment
-    public interface RepliesClickedListener {
-        void repliesClicked(String[] repliesID);
-    }
 
     public RepliesAdapter() {
         context = MyApp.get().getApplicationContext();
@@ -69,10 +63,6 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.HackerNe
 
     public void setComments(List<HackerNewsComment> hackerNewsCommentsList) {
         this.hackerNewsCommentsList = hackerNewsCommentsList;
-    }
-
-    public void setDelegate(RepliesClickedListener delegate) {
-        this.delegate = delegate;
     }
 
     class HackerNewsCommentHolder extends RecyclerView.ViewHolder {

@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.crashlytics.android.Crashlytics;
@@ -44,12 +43,9 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
         if (findViewById(R.id.fl_main) != null) {
             // Not restored from previous state
             if (savedInstanceState == null) {
-                Log.d("MainActivity", "savedInstanceState == null");
                 showTopStories();
             } else {
-                Log.d("MainActivity", "savedInstanceState != null");
                 changeTitle();
-                return;
             }
         }
     }
@@ -72,24 +68,20 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Make back button in toolbar function properly
-        switch (item.getItemId()){
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-        }
+        // Should return true to consume the event
+        // but let it go as there's no other MenuItem
+        // , also no need for switch case as there's only one item.
+        onBackPressed();
         return super.onOptionsItemSelected(item);
     }
 
 
     private void showBackButton() {
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void hideBackButton() {
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
     }
 
     private void showTopStories() {
@@ -106,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
         fragmentTransaction.addToBackStack(CommentsFragment.class.getSimpleName());
         fragmentTransaction.commit();
 
-        getSupportActionBar().setTitle(R.string.title_comments);
+        //getSupportActionBar().setTitle(R.string.title_comments);
         showBackButton();
     }
 
@@ -118,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
         fragmentTransaction.addToBackStack(RepliesFragment.class.getSimpleName());
         fragmentTransaction.commit();
 
-        getSupportActionBar().setTitle(R.string.title_replies);
+        //getSupportActionBar().setTitle(R.string.title_replies);
         showBackButton();
     }
 
@@ -138,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
             getSupportActionBar().setTitle(R.string.title_top_stories);
         else if (displayFragment instanceof CommentsFragment)
             getSupportActionBar().setTitle(R.string.title_comments);
-        else if (displayFragment instanceof TopStoriesFragment)
-            getSupportActionBar().setTitle(R.string.title_top_stories);
+        else if (displayFragment instanceof RepliesFragment)
+            getSupportActionBar().setTitle(R.string.title_replies);
     }
 }

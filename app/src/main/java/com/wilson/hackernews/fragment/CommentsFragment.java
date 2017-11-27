@@ -50,7 +50,7 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     @BindView(R.id.rv_comments) RecyclerView commentsRV;
     @BindView(R.id.ll_comments) LinearLayout commentsLL;
     @BindView(R.id.ll_empty_comments) LinearLayout emptyCommentsLL;
-    @BindView(R.id.tv_load_more) TextView loadMoreTV;
+    @BindView(R.id.tv_load_more_comments) TextView loadMoreTV;
 
     public static CommentsFragment newInstance(String[] commentsID)
     {
@@ -76,10 +76,7 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        //Log.d(TAG, "onViewCreated savedInstanceState == null");
         Bundle args = getArguments();
-        //commentsID = args.getParcelable(COMMENTS_FRAGMENT_ARGUMENT_KEY);
         commentsID = args.getStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY);
 
         MyApp.getAppComponent().inject(this);
@@ -88,9 +85,8 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
 
         commentsSRL.setEnabled(false); // Disable refresh function
         commentsSRL.setRefreshing(true); // Show refreshing animation
-        commentsAdapter = new CommentsAdapter();
+        commentsAdapter = new CommentsAdapter(this);
         commentsAdapter.setComments(hackerNewsCommentList);
-        commentsAdapter.setDelegate(this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         commentsRV.setLayoutManager(mLayoutManager);
@@ -146,8 +142,8 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
 
     @Override
     public void repliesClicked(String[] repliesID) {
-        if (delegate != null)
-            delegate.showReplies(repliesID);;
+        //if (delegate != null) // Removed for code coverage, not possible to encounter null too.
+        delegate.showReplies(repliesID);
     }
 
     private void showStoriesEmpty() {

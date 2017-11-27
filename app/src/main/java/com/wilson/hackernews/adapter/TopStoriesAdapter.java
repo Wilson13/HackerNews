@@ -15,6 +15,8 @@ import com.wilson.hackernews.other.Utils;
 
 import java.util.List;
 
+import static com.wilson.hackernews.other.Utils.getCorrectURL;
+
 public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.HackerNewsStoryHolder> {
 
     private static final String TAG = "TopStoriesAdapter";
@@ -29,8 +31,9 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
         void commentsClicked(String[] commentsID);
     }
 
-    public TopStoriesAdapter() {
+    public TopStoriesAdapter(CommentsClickedListener delegate) {
         context = MyApp.get().getApplicationContext();
+        this.delegate = delegate;
     }
 
     @Override
@@ -57,7 +60,11 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
         // Display the information
         holder.title.setText(title);
         holder.properties.setText(context.getString(R.string.story_properties, score, byName, timePosted));
-        holder.comments.setText(numComments > 1 ? numComments + " comments" : numComments + " comment");
+
+        if (numComments > 0)
+            holder.comments.setText(numComments > 1 ? numComments + " comments" : numComments + " comment");
+        else
+            holder.comments.setVisibility(View.GONE);
     }
 
     @Override
@@ -67,10 +74,6 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
 
     public void setData(List<HackerNewsStory> hackerNewsStoryList) {
         this.hackerNewsStoryList = hackerNewsStoryList;
-    }
-
-    public void setDelegate(CommentsClickedListener delegate) {
-        this.delegate = delegate;
     }
 
     class HackerNewsStoryHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -101,7 +104,7 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
 
             // Handle click on comments
             if (v.getId() == R.id.tv_comments) {
-                if (delegate != null && numComments > 0) {
+                if (numComments > 0) {
                     Log.d(TAG, "title: " + title + " kids size: " + kids.length);
                     delegate.commentsClicked(kids);
                 }
@@ -109,12 +112,8 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
             // Handle click on RecyclerView item
             else {
                 // In case URL doesn't start with http or https
-                if (!url.startsWith("http://") && !url.startsWith("https://"))
-                    url = "http://" + url;
-
-                if (delegate != null) {
-                    delegate.storyClicked(url);
-                }
+                url = getCorrectURL(url);
+                delegate.storyClicked(url);
             }
         }
     }

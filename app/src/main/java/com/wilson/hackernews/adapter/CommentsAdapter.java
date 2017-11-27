@@ -29,8 +29,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
         void repliesClicked(String[] repliesID);
     }
 
-    public CommentsAdapter() {
+    public CommentsAdapter(RepliesClickedListener delegate) {
         context = MyApp.get().getApplicationContext();
+        this.delegate = delegate;
     }
 
     @Override
@@ -67,17 +68,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
 
         // Display "View replies" if there are replies to this comment
         // (showing only 1 level as stated in the requirement).
-        if (kids != null && kids.length > 0)
-            holder.viewReplies.setVisibility(View.VISIBLE);
-
-        holder.viewReplies.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "viewreplies clicked!");
-                if (delegate != null)
-                    delegate.repliesClicked(kids);
-            }
-        });
+        if (kids == null || kids.length < 0)
+            holder.viewReplies.setVisibility(View.GONE);
     }
 
     @Override
@@ -89,21 +81,24 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
         this.hackerNewsCommentsList = hackerNewsCommentsList;
     }
 
-    public void setDelegate(RepliesClickedListener delegate) {
-        this.delegate = delegate;
-    }
-
-    class HackerNewsCommentHolder extends RecyclerView.ViewHolder {
+    public class HackerNewsCommentHolder extends RecyclerView.ViewHolder {
 
         TextView properties;
         TextView content;
         TextView viewReplies;
+        HackerNewsComment currentItem;
 
         HackerNewsCommentHolder(View itemView) {
             super(itemView);
             properties = (TextView) itemView.findViewById(R.id.tv_comment_properties);
             content = (TextView) itemView.findViewById(R.id.tv_comment_content);
             viewReplies = (TextView) itemView.findViewById(R.id.tv_view_replies);
+
+            if (getItemCount() > getAdapterPosition() && getAdapterPosition() > 0) {
+                currentItem = hackerNewsCommentsList.get(getAdapterPosition());
+                String[] kids = currentItem.getKids();
+                viewReplies.setOnClickListener(v -> delegate.repliesClicked(kids));
+            }
         }
     }
 }

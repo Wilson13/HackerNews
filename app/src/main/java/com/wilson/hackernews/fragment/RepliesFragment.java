@@ -48,7 +48,7 @@ public class RepliesFragment extends Fragment implements GetHackerNewsContract.C
     @BindView(R.id.rv_replies) RecyclerView repliesRV;
     @BindView(R.id.ll_replies) LinearLayout repliesLL;
     @BindView(R.id.ll_empty_replies) LinearLayout emptyRepliesLL;
-    @BindView(R.id.tv_load_more) TextView loadMoreTV;
+    @BindView(R.id.tv_load_more_replies) TextView loadMoreTV;
 
     public static RepliesFragment newInstance(String[] repliesID)
     {
