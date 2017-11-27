@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,6 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.HackerNe
     public void onBindViewHolder(final HackerNewsCommentHolder holder, int position) {
         // Get story from HackerNews story list
         HackerNewsComment currentItem = hackerNewsCommentsList.get(position);
-        Log.d(TAG, "onBindViewHolder currentItem parent: " + currentItem.getParent());
 
         String content = currentItem.getText();
         String byName = currentItem.getBy();

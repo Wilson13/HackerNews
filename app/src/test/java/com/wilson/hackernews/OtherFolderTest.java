@@ -15,6 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import retrofit2.Retrofit;
 
 import static com.wilson.hackernews.other.Constants.HACKER_NEWS_BASE_URL;
+import static com.wilson.hackernews.other.Utils.getComments;
 import static com.wilson.hackernews.other.Utils.getCorrectURL;
 import static com.wilson.hackernews.other.Utils.getElapsedTime;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -40,12 +41,19 @@ public class OtherFolderTest {
     @Test
     public void UtilsGetElapsedTimeTest() {
         long currentTime = System.currentTimeMillis() / 1000;
+        long oneDayAgo = currentTime - Constants.NUM_SECONDS_DAY;
+        long twoDaysAgo = currentTime - (2 * Constants.NUM_SECONDS_DAY);
         long oneHourAgo = currentTime - Constants.NUM_SECONDS_HOUR;
         long twoHourAgo = currentTime - (2 * Constants.NUM_SECONDS_HOUR);
         long oneMinAgo = currentTime - Constants.NUM_SECONDS_MINUTE;
         long twoMinsAgo = currentTime - (2 * Constants.NUM_SECONDS_MINUTE);
-        long zeroSecAgo = currentTime;
         long twoSescAgo = currentTime - 2;
+
+        // Test 1 day
+        Assert.assertEquals("1 day", getElapsedTime(oneDayAgo, currentTime));
+
+        // Test 2 days
+        Assert.assertEquals("2 days", getElapsedTime(twoDaysAgo, currentTime));
 
         // Test 1 hour
         Assert.assertEquals("1 hour", getElapsedTime(oneHourAgo, currentTime));
@@ -63,7 +71,7 @@ public class OtherFolderTest {
         Assert.assertEquals("2 mins", getElapsedTime(twoMinsAgo, currentTime));
 
         // Test 2 minutes
-        Assert.assertEquals("1 sec", getElapsedTime(zeroSecAgo, currentTime));
+        Assert.assertEquals("1 sec", getElapsedTime(currentTime, currentTime));
 
         // Test 2 minutes
         Assert.assertEquals("2 secs", getElapsedTime(twoSescAgo, currentTime));
@@ -73,6 +81,17 @@ public class OtherFolderTest {
     public void UtilsGetCorrectURL() {
         String correctURL = "http://google.com";
         String url = "google.com";
+
         Assert.assertEquals(correctURL, getCorrectURL(url));
+        Assert.assertEquals(correctURL, getCorrectURL(correctURL));
+    }
+
+    @Test
+    public void UtilsGetComment() {
+        int oneComment = 1;
+        int twoComment = 2;
+
+        Assert.assertEquals("1 comment", getComments(oneComment));
+        Assert.assertEquals("2 comments", getComments(twoComment));
     }
 }

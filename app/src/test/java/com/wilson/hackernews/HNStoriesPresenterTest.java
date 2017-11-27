@@ -51,8 +51,6 @@ public class HNStoriesPresenterTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        //RxAndroidPlugins.setInitMainThreadSchedulerHandler(
-        //        __ -> Schedulers.trampoline());
 
         Scheduler immediate = new Scheduler() {
             @Override
@@ -86,8 +84,6 @@ public class HNStoriesPresenterTest {
         // When API getTopStories() is called, return the hackerNewsStoryList defined.
         when(dataSource.getStories(storiesToPullList)).thenReturn(Observable.fromIterable(storiesToPullList).flatMap(id -> dataSource.getStory(id)).toList());
 
-                //Single.fromObservable(Observable.fromIterable(hackerNewsStoryList)));
-
         when(dataSource.getStory(storyID)).thenReturn(Observable.just(story));
         when(dataSource.getStory(storyID2)).thenReturn(Observable.just(story2));
 
@@ -95,7 +91,6 @@ public class HNStoriesPresenterTest {
         presenter.setView(storiesView);
         verify(dataSource).getTopStories();
         verify(storiesView, atLeastOnce()).onFetchStoriesStart();
-        //verify(presenter).loadMoreStories();
         verify(storiesView, atLeastOnce()).onFetchStoriesStart();
         verify(dataSource).getStories(storiesToPullList);
         dataSource.getStories(storiesToPullList).subscribe(); // This line is required for  verify(storiesView).onFetchStoriesSuccess to work

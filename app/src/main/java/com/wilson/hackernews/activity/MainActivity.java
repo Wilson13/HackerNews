@@ -56,7 +56,8 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
 
             // If only one Fragment left in stack (which is the CommentsFragment,
-            // TopStoriesFragment will never be in the stack), hide back button.
+            // TopStoriesFragment will never be in the stack), hide back button since
+            // we are popping it out, so TopStoriesFragment will be displayed.
             if (getSupportFragmentManager().getBackStackEntryCount() == 1)
                 hideBackButton();
 
@@ -97,8 +98,6 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
         fragmentTransaction.add(R.id.fl_main, CommentsFragment.newInstance(commentsID), CommentsFragment.class.getSimpleName());
         fragmentTransaction.addToBackStack(CommentsFragment.class.getSimpleName());
         fragmentTransaction.commit();
-
-        //getSupportActionBar().setTitle(R.string.title_comments);
         showBackButton();
     }
 
@@ -109,15 +108,11 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
         fragmentTransaction.add(R.id.fl_main, RepliesFragment.newInstance(repliesID), RepliesFragment.class.getSimpleName());
         fragmentTransaction.addToBackStack(RepliesFragment.class.getSimpleName());
         fragmentTransaction.commit();
-
-        //getSupportActionBar().setTitle(R.string.title_replies);
         showBackButton();
     }
 
     @Override
     public void onBackStackChanged() {
-        Fragment displayFragment = getSupportFragmentManager().findFragmentById(R.id.fl_main);
-
         // Set correct title
         changeTitle();
     }
@@ -130,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
             getSupportActionBar().setTitle(R.string.title_top_stories);
         else if (displayFragment instanceof CommentsFragment)
             getSupportActionBar().setTitle(R.string.title_comments);
-        else if (displayFragment instanceof RepliesFragment)
+        else
             getSupportActionBar().setTitle(R.string.title_replies);
     }
 }

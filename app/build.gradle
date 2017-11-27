@@ -51,12 +51,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
-    testOptions {
-        unitTests {
-            includeAndroidResources = true
-        }
-    }
 }
 
 buildscript {
@@ -101,7 +95,6 @@ dependencies {
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.2.0'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.7.22'
-    testImplementation "org.robolectric:robolectric:3.5.1"
 
     // Butterknife
     implementation 'com.jakewharton:butterknife:8.8.1'

@@ -2,7 +2,6 @@ package com.wilson.hackernews.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +14,7 @@ import com.wilson.hackernews.other.Utils;
 
 import java.util.List;
 
+import static com.wilson.hackernews.other.Utils.getComments;
 import static com.wilson.hackernews.other.Utils.getCorrectURL;
 
 public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.HackerNewsStoryHolder> {
@@ -40,7 +40,6 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
     public HackerNewsStoryHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View inflatedView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recycler_hacker_news_story, parent, false);
-        Log.d(TAG, "onCreateViewHolder");
         return new HackerNewsStoryHolder(inflatedView);
     }
 
@@ -52,6 +51,7 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
         final String title = currentItem.getTitle();
         String score = currentItem.getScore();
         String byName = currentItem.getBy();
+        String[] kids = currentItem.getKids();
         int numComments = currentItem.getDescendants();
 
         // Unix time is in seconds
@@ -61,8 +61,8 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
         holder.title.setText(title);
         holder.properties.setText(context.getString(R.string.story_properties, score, byName, timePosted));
 
-        if (numComments > 0)
-            holder.comments.setText(numComments > 1 ? numComments + " comments" : numComments + " comment");
+        if (kids != null && kids.length > 0)
+            holder.comments.setText(getComments(numComments));
         else
             holder.comments.setVisibility(View.GONE);
     }
@@ -98,16 +98,12 @@ public class TopStoriesAdapter extends RecyclerView.Adapter<TopStoriesAdapter.Ha
             // https://stackoverflow.com/questions/33845846/why-is-adding-an-onclicklistener-inside-onbindviewholder-of-a-recyclerview-adapt
 
             HackerNewsStory currentItem = hackerNewsStoryList.get(getAdapterPosition());
-            int numComments = currentItem.getDescendants();
             String[] kids = currentItem.getKids();
             String url = currentItem.getUrl();
 
             // Handle click on comments
             if (v.getId() == R.id.tv_comments) {
-                if (numComments > 0) {
-                    Log.d(TAG, "title: " + title + " kids size: " + kids.length);
-                    delegate.commentsClicked(kids);
-                }
+                delegate.commentsClicked(kids);
             }
             // Handle click on RecyclerView item
             else {

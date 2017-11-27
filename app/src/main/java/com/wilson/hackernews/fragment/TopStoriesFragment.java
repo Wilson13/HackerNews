@@ -155,8 +155,7 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
 
     @Override
     public void commentsClicked(String[] commentsID) {
-        //if (delegate != null) // Removed for code coverage, not possible to encounter null too.
-            delegate.showComments(commentsID);
+        delegate.showComments(commentsID);
     }
 
     private void showStoriesEmpty() {

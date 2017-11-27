@@ -50,7 +50,7 @@
             android:textSize="@dimen/small_size"
             android:textColor="@color/colorPrimary"
             android:background="@android:color/transparent"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
     </LinearLayout>
 

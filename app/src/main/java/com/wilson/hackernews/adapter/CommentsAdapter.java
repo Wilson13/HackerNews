@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +44,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
     public void onBindViewHolder(final HackerNewsCommentHolder holder, int position) {
         // Get story from HackerNews story list
         HackerNewsComment currentItem = hackerNewsCommentsList.get(position);
-        Log.d(TAG, "onBindViewHolder currentItem parent: " + currentItem.getParent());
 
         String content = currentItem.getText();
         String byName = currentItem.getBy();
@@ -59,16 +57,14 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
         holder.properties.setText(context.getString(R.string.comment_properties, byName, timeCommented));
 
         // Display comments with HTML entities
-        if (content != null) {
-            if (Build.VERSION.SDK_INT >= 24)
-                holder.content.setText(Html.fromHtml(content, Html.FROM_HTML_MODE_LEGACY));
-            else
-                holder.content.setText(Html.fromHtml(content));
-        }
+        if (Build.VERSION.SDK_INT >= 24)
+            holder.content.setText(Html.fromHtml(content, Html.FROM_HTML_MODE_LEGACY));
+        else
+            holder.content.setText(Html.fromHtml(content));
 
         // Display "View replies" if there are replies to this comment
         // (showing only 1 level as stated in the requirement).
-        if (kids == null || kids.length < 0)
+        if (kids == null || kids.length <= 0)
             holder.viewReplies.setVisibility(View.GONE);
     }
 
@@ -81,24 +77,25 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
         this.hackerNewsCommentsList = hackerNewsCommentsList;
     }
 
-    public class HackerNewsCommentHolder extends RecyclerView.ViewHolder {
+    public class HackerNewsCommentHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView properties;
         TextView content;
         TextView viewReplies;
-        HackerNewsComment currentItem;
 
         HackerNewsCommentHolder(View itemView) {
             super(itemView);
             properties = (TextView) itemView.findViewById(R.id.tv_comment_properties);
             content = (TextView) itemView.findViewById(R.id.tv_comment_content);
             viewReplies = (TextView) itemView.findViewById(R.id.tv_view_replies);
+            viewReplies.setOnClickListener(this);
+        }
 
-            if (getItemCount() > getAdapterPosition() && getAdapterPosition() > 0) {
-                currentItem = hackerNewsCommentsList.get(getAdapterPosition());
-                String[] kids = currentItem.getKids();
-                viewReplies.setOnClickListener(v -> delegate.repliesClicked(kids));
-            }
+        @Override
+        public void onClick(View v) {
+            HackerNewsComment currentItem = hackerNewsCommentsList.get(getAdapterPosition());
+            String[] kids = currentItem.getKids();
+            delegate.repliesClicked(kids);
         }
     }
 }
