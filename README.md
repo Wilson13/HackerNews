@@ -35,6 +35,13 @@ Below is an introduction to the functionality and screen flow of the app.
 
 ![ScreenShot](https://s33.postimg.org/hmgm88fgv/Screenshot_1511836806.png "Replies")
 
+# Others
+
+1. On all three screens, only 10 items are loaded each time. 
+
+2. "Load more" will be shown if more than 10 items are available.
+
+3. Currently there is no pagination implemented, so if "Load more" was clicked, there is no way of showing previous items. Clicking on the back button will only close the current screen and go back to the previous screen.
 
 
 
