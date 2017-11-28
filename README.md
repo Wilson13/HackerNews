@@ -5,4 +5,4 @@ There are three screens on this app.
 
 1. Top Stories
 
-![Top Stories](https://postimg.org/image/4tsi87oej/)
+![ScreenShot](https://s33.postimg.org/xw6sb1aof/Screenshot_1511836757.png "Optional title")
