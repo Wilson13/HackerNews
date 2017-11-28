@@ -43,5 +43,8 @@ Below is an introduction to the functionality and screen flow of the app.
 
 3. Currently there is no pagination implemented, so if "Load more" was clicked, there is no way of showing previous items. Clicking on the back button will only close the current screen and go back to the previous screen.
 
+4. To generate code coverage report, run the following command in the terminal at project level directory: <br>"gradlew clean jacocoTestReport --stacktrace"
+
+5. The generated report can be found at: <br>{Project Directory}/app/build/reports/jacoco/jacocoTestReport/html/index.html
 
 
