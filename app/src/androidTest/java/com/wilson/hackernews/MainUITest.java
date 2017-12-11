@@ -57,7 +57,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withParent;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.support.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread;
-import static org.hamcrest.core.AllOf.allOf;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 
@@ -89,7 +89,7 @@ public class MainUITest {
     }
 
     @Test
-    public void MainUITest() throws Throwable {
+    public void MainInstrumentationTest() throws Throwable {
 
         String storyResponse = "{\n" +
                 "  \"by\" : \"heshamg\",\n" +
@@ -224,8 +224,7 @@ public class MainUITest {
         // Start MockWebServer
         server.play();
 
-        String url = server.getUrl("/").toString();
-        Constants.HACKER_NEWS_BASE_URL = url;
+        Constants.HACKER_NEWS_BASE_URL = server.getUrl("/").toString();
 
         Intent intent = new Intent();
         mainActivity.launchActivity(intent);
@@ -356,34 +355,11 @@ public class MainUITest {
             onView(withId(R.id.ll_empty_stories)).check(matches(isDisplayed()));
         }
 
-        // This sleep is required for the refresh to finish
-        //Thread.sleep(2000);
-
-        // Couldn't break these tests into different files as they all rely on
-        // same activity, running them together in separate test files would fail.
-
-        //Reload stories (calling onRefresh directly cause error, not sure about the reason)
-
-        /*Fragment finalDisplayFragment = displayFragment;
-        Runnable myRunnable = new Runnable(){
-            @Override
-            public void run(){
-                // What you want to run //
-                ((TopStoriesFragment) finalDisplayFragment).onRefresh();
-            }
-        };*/
-
-        //runOnUiThread(myRunnable);
-        //InstrumentationRegistry.getInstrumentation().waitForIdle(myRunnable);
         onView(withId(R.id.srl_top_stories))
                 .perform(withCustomConstraints(swipeDown(), isDisplayingAtLeast(85)));
 
         // Check that load more button is not displayed when onRefresh() method is called
-        //runOnUiThread(((TopStoriesFragment) displayFragment)::onRefresh);
-        //onView(withId(R.id.tv_load_more_stories)).check(matches(not(isDisplayed())));
-
-        // This sleep is required for the refresh to finish
-        //Thread.sleep(3000);
+        onView(withId(R.id.tv_load_more_stories)).check(matches(not(isDisplayed())));
 
         // Check that TopStoriesFragment is displayed
         onView(withId(R.id.ll_stories)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
@@ -391,9 +367,6 @@ public class MainUITest {
         // Click first story's comments on the list
         onView(withId(R.id.rv_top_stories))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, ClickAction.clickChildViewWithId(R.id.tv_comments)));
-
-        // This sleep is required for the load to finish
-        //Thread.sleep(2000);
 
         // Check that CommentsFragment is displayed
         onView(withId(R.id.ll_comments)).check(matches(isDisplayed()));
@@ -413,12 +386,8 @@ public class MainUITest {
         rotateScreen();
 
         // Check that load more button is not displayed when onRefresh() method is called
-        //runOnUiThread(((TopStoriesFragment) displayFragment)::onRefresh);
         onView(withId(R.id.srl_top_stories))
                 .perform(withCustomConstraints(swipeDown(), isDisplayingAtLeast(95)));
-
-        // This sleep is required for the refresh to finish
-        Thread.sleep(2000);
 
         // Check that no "{N} comments" button was displayed
         onView(withId(R.id.tv_comments)).check(matches(not(isDisplayed())));
