@@ -89,6 +89,7 @@ public class HNStoriesPresenterTest {
 
         // When setView(View view) is called, verify loadNewStories is called.
         presenter.setView(storiesView);
+        presenter.loadNewStories();
         verify(dataSource).getTopStories();
         verify(storiesView, atLeastOnce()).onFetchStoriesStart();
         verify(storiesView, atLeastOnce()).onFetchStoriesStart();
@@ -115,6 +116,7 @@ public class HNStoriesPresenterTest {
         when(dataSource.getStory(storyID)).thenReturn(Observable.just(story));
 
         presenter.setView(storiesView);
+        presenter.loadNewStories();
         verify(dataSource).getTopStories();
         verify(storiesView, atLeastOnce()).onFetchStoriesStart();
         verify(storiesView, atLeastOnce()).onFetchStoriesStart();
@@ -137,13 +139,14 @@ public class HNStoriesPresenterTest {
         when(dataSource.getStories(storiesToPullList)).thenReturn(Single.fromObservable(Observable.fromIterable(hackerNewsStoryList)));
 
         presenter.setView(storiesView);
+        presenter.loadNewStories();
         verify(dataSource).getTopStories();
         verify(storiesView, atLeastOnce()).onFetchStoriesStart();
         verify(storiesView, atLeastOnce()).onFetchStoriesStart();
         verify(dataSource).getStories(storiesToPullList);
 
         dataSource.getStories(storiesToPullList).subscribe(hackerNewsStories -> {}, error -> {});
-        verify(storiesView).onFecthStoriesError();
+        verify(storiesView).onFetchStoriesError();
     }
 
     @Test
@@ -157,6 +160,6 @@ public class HNStoriesPresenterTest {
         HNStoriesPresenter presenter = new HNStoriesPresenter(dataSource);
         presenter.setView(storiesView);
         presenter.loadNewStories();
-        verify(storiesView, atLeastOnce()).onFecthStoriesError();
+        verify(storiesView, atLeastOnce()).onFetchStoriesError();
     }
 }

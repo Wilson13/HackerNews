@@ -2,12 +2,12 @@ package com.wilson.hackernews.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +29,9 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.wilson.hackernews.other.Constants.COMMENTS_FRAGMENT_ARGUMENT_KEY;
+import static com.wilson.hackernews.other.Constants.COMMENTS_FRAGMENT_COMMENTS_ID_KEY;
+import static com.wilson.hackernews.other.Constants.COMMENTS_FRAGMENT_COMMENT_LIST_KEY;
+import static com.wilson.hackernews.other.Constants.COMMENTS_FRAGMENT_PRESENTER_KEY;
 
 public class CommentsFragment extends Fragment implements GetHackerNewsContract.CommentsView, View.OnClickListener, CommentsAdapter.RepliesClickedListener {
 
@@ -56,8 +58,8 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     {
         CommentsFragment f = new CommentsFragment();
         Bundle args = new Bundle();
-        args.putStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY, commentsID);
-        //args.putParcelable(COMMENTS_FRAGMENT_ARGUMENT_KEY, story);
+        args.putStringArray(COMMENTS_FRAGMENT_COMMENTS_ID_KEY, commentsID);
+        //args.putParcelable(COMMENTS_FRAGMENT_COMMENTS_ID_KEY, story);
         f.setArguments(args);
         return f;
     }
@@ -69,7 +71,7 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
         ButterKnife.bind(this, v);
 
         Bundle args = getArguments();
-        commentsID = args.getStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY);
+        commentsID = args.getStringArray(COMMENTS_FRAGMENT_COMMENTS_ID_KEY);
         return v;
     }
 
@@ -77,14 +79,28 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Bundle args = getArguments();
-        commentsID = args.getStringArray(COMMENTS_FRAGMENT_ARGUMENT_KEY);
+        commentsID = args.getStringArray(COMMENTS_FRAGMENT_COMMENTS_ID_KEY);
 
         MyApp.getAppComponent().inject(this);
-        presenter.setView(this);
-        presenter.loadComments(commentsID); // Pull comments from server
 
-        commentsSRL.setEnabled(false); // Disable refresh function
-        commentsSRL.setRefreshing(true); // Show refreshing animation
+        // Disable refresh function, put before any other code to make sure setRefreshing works when called.
+        commentsSRL.setEnabled(false);
+
+        if (savedInstanceState != null) {
+            hackerNewsCommentList.addAll(savedInstanceState.getParcelableArrayList(COMMENTS_FRAGMENT_COMMENT_LIST_KEY));
+            HNCommentsPresenter mPresenter = savedInstanceState.getParcelable(COMMENTS_FRAGMENT_PRESENTER_KEY);
+
+            if (mPresenter != null)
+                presenter = mPresenter;
+
+            presenter.setView(this);
+            presenter.checkHasMoreStories();
+        }
+        else {
+            presenter.setView(this);
+            presenter.loadComments(commentsID); // Pull comments from server
+        }
+
         commentsAdapter = new CommentsAdapter(this);
         commentsAdapter.setComments(hackerNewsCommentList);
 
@@ -92,6 +108,15 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
         commentsRV.setLayoutManager(mLayoutManager);
         commentsRV.setAdapter(commentsAdapter);
         loadMoreTV.setOnClickListener(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Use bundle to save stories list and presenter.
+        // Should be updated to use the new arch component (viewmodel, livedata, etc.) in the future.
+        outState.putParcelableArrayList(COMMENTS_FRAGMENT_COMMENT_LIST_KEY, (ArrayList<? extends Parcelable>) hackerNewsCommentList);
+        outState.putParcelable(COMMENTS_FRAGMENT_PRESENTER_KEY, presenter);
     }
 
     @Override
@@ -108,19 +133,21 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     @Override
     public void onClick(View v) {
         commentsSRL.setRefreshing(true);
-        hackerNewsCommentList.clear();
-        commentsAdapter.notifyDataSetChanged();
         hideLoadMore();
         presenter.loadMoreComments();
     }
 
     @Override
+    public void onFetchStoriesStart() {
+        commentsSRL.setRefreshing(true); // Show refreshing animation
+    }
+
+    @Override
     public void onFetchCommentsSuccess(List<HackerNewsComment> hackerNewsCommentList) {
-        Log.d(TAG, "onFetchCommentsSuccess: " + hackerNewsCommentList.size());
-        this.hackerNewsCommentList.clear();
         this.hackerNewsCommentList.addAll(hackerNewsCommentList);
         commentsAdapter.notifyDataSetChanged();
         commentsSRL.setRefreshing(false);
+        ((LinearLayoutManager)commentsRV.getLayoutManager()).scrollToPositionWithOffset(commentsAdapter.getItemCount() - 11, 0);
         showStoriesLoaded();
     }
 

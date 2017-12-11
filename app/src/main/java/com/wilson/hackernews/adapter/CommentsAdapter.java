@@ -1,10 +1,7 @@
 package com.wilson.hackernews.adapter;
 
 import android.content.Context;
-import android.os.Build;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +13,8 @@ import com.wilson.hackernews.other.MyApp;
 import com.wilson.hackernews.other.Utils;
 
 import java.util.List;
+
+import static com.wilson.hackernews.other.Utils.getStyledText;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.HackerNewsCommentHolder> {
 
@@ -51,9 +50,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
         final String[] kids = currentItem.getKids();
         long time = currentItem.getTime();
 
-        if (content != null)
-            Log.d(TAG, "content: " + content);
-
         // Unix time is in seconds
         String timeCommented = Utils.getElapsedTime(time, System.currentTimeMillis() / 1000);
 
@@ -61,10 +57,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
         holder.properties.setText(context.getString(R.string.comment_properties, byName, timeCommented));
 
         // Display comments with HTML entities
-        if (Build.VERSION.SDK_INT >= 24 && content != null)
-            holder.content.setText(Html.fromHtml(content, Html.FROM_HTML_MODE_LEGACY));
-        else if (content != null)
-            holder.content.setText(Html.fromHtml(content));
+        if (content != null)
+            holder.content.setText(getStyledText(content));
 
         // Display "View replies" if there are replies to this comment
         // (showing only 1 level as stated in the requirement).

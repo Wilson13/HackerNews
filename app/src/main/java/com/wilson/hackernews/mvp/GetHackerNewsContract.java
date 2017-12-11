@@ -17,11 +17,13 @@ public interface GetHackerNewsContract {
 
     interface StoriesView {
 
+        void onFetchTopStoriesIdSuccess();
+
         void onFetchStoriesStart();
 
         void onFetchStoriesSuccess(List<HackerNewsStory> hackerNewsStoryList);
 
-        void onFecthStoriesError();
+        void onFetchStoriesError();
 
         void showLoadMore();
 
@@ -37,6 +39,8 @@ public interface GetHackerNewsContract {
     }
 
     interface CommentsView {
+
+        void onFetchStoriesStart();
 
         void onFetchCommentsSuccess(List<HackerNewsComment> hackerNewsCommentList);
 

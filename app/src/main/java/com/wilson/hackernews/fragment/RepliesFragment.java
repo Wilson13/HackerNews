@@ -1,6 +1,7 @@
 package com.wilson.hackernews.fragment;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -28,6 +29,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.wilson.hackernews.other.Constants.REPLIES_FRAGMENT_ARGUMENT_KEY;
+import static com.wilson.hackernews.other.Constants.REPLIES_FRAGMENT_PRESENTER_KEY;
+import static com.wilson.hackernews.other.Constants.REPLIES_FRAGMENT_REPLY_LIST_KEY;
 
 /**
  * Uses same View (CommentsView), Presenter (HNCommentsPresenter), and
@@ -75,11 +78,24 @@ public class RepliesFragment extends Fragment implements GetHackerNewsContract.C
         repliesID = args.getStringArray(REPLIES_FRAGMENT_ARGUMENT_KEY);
 
         MyApp.getAppComponent().inject(this);
-        presenter.setView(this);
-        presenter.loadComments(repliesID);
 
         repliesSRL.setEnabled(false); // Disable refresh function
-        repliesSRL.setRefreshing(true); // Show refreshing animation
+
+        if (savedInstanceState != null) {
+            hackerNewsRepliesList.addAll(savedInstanceState.getParcelableArrayList(REPLIES_FRAGMENT_REPLY_LIST_KEY));
+            HNCommentsPresenter mPresenter = savedInstanceState.getParcelable(REPLIES_FRAGMENT_PRESENTER_KEY);
+
+            if (mPresenter != null)
+                presenter = mPresenter;
+
+            presenter.setView(this);
+            presenter.checkHasMoreStories();
+        }
+        else {
+            presenter.setView(this);
+            presenter.loadComments(repliesID); // Pull comments from server
+        }
+
         repliesAdapter = new RepliesAdapter();
         repliesAdapter.setComments(hackerNewsRepliesList);
 
@@ -90,12 +106,26 @@ public class RepliesFragment extends Fragment implements GetHackerNewsContract.C
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Use bundle to save stories list and presenter.
+        // Should be updated to use the new arch component (viewmodel, livedata, etc.) in the future.
+        outState.putParcelableArrayList(REPLIES_FRAGMENT_REPLY_LIST_KEY, (ArrayList<? extends Parcelable>) hackerNewsRepliesList);
+        outState.putParcelable(REPLIES_FRAGMENT_PRESENTER_KEY, presenter);
+    }
+
+    @Override
     public void onClick(View v) {
         repliesSRL.setRefreshing(true);
         hackerNewsRepliesList.clear();
         repliesAdapter.notifyDataSetChanged();
         hideLoadMore();
         presenter.loadMoreComments();
+    }
+
+    @Override
+    public void onFetchStoriesStart() {
+        repliesSRL.setRefreshing(true); // Show refreshing animation
     }
 
     @Override

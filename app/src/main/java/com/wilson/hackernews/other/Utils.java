@@ -1,5 +1,9 @@
 package com.wilson.hackernews.other;
 
+import android.os.Build;
+import android.text.Html;
+import android.text.Spanned;
+
 import static com.wilson.hackernews.other.Constants.NUM_SECONDS_DAY;
 import static com.wilson.hackernews.other.Constants.NUM_SECONDS_HOUR;
 import static com.wilson.hackernews.other.Constants.NUM_SECONDS_MINUTE;
@@ -47,6 +51,21 @@ public class Utils {
             return numComments + " comments";
         else
             return numComments + " comment";
+    }
+
+    public static Spanned getStyledText(String content) {
+        // Use a variable to avoid deprecation warning.
+        // Could have used a @SuppressWarnings("deprecation") annotation too.
+        Spanned result;
+        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(content, Html.FROM_HTML_MODE_LEGACY);
+            System.out.print(String.valueOf(">= 24: " + Build.VERSION.SDK_INT));
+        }
+        else {
+            result = Html.fromHtml(content);
+            System.out.print(String.valueOf("< 24: " + Build.VERSION.SDK_INT));
+        }
+        return result;
     }
 
 }

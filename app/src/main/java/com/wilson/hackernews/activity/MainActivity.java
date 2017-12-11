@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.crashlytics.android.Crashlytics;
@@ -20,6 +21,10 @@ import butterknife.ButterKnife;
 import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity implements TopStoriesFragment.TopStoriesListener, CommentsFragment.CommentsListener, FragmentManager.OnBackStackChangedListener {
+
+    private static final String TAG_TOP_STORIES_FRAGMENT = "TopStoriesFragment";
+    private static final String TAG_COMMENTS_FRAGMENT = "CommentsFragment";
+    private static final String TAG_REPLIES_FRAGMENT = "RepliesFragment";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -41,8 +46,14 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
         if (findViewById(R.id.fl_main) != null) {
+
+            // Check if TopStoriesFragment is in stack, if not, create new fragment.
+            FragmentManager fm = getSupportFragmentManager();
+            TopStoriesFragment topStoriesFragment = (TopStoriesFragment) fm.findFragmentByTag(TAG_TOP_STORIES_FRAGMENT);
+
             // Not restored from previous state
-            if (savedInstanceState == null) {
+            if (topStoriesFragment == null) {//savedInstanceState == null) {
+                Log.d("MainActivity", "topStoriesFragment is null");
                 showTopStories();
             } else {
                 changeTitle();
@@ -76,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
         return super.onOptionsItemSelected(item);
     }
 
-
     private void showBackButton() {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
@@ -86,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
     }
 
     private void showTopStories() {
-        getSupportFragmentManager().beginTransaction().replace(R.id.fl_main, TopStoriesFragment.newInstance()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fl_main, TopStoriesFragment.newInstance(), TAG_TOP_STORIES_FRAGMENT).commit();
         getSupportActionBar().setTitle(R.string.title_top_stories);
         hideBackButton();
     }
@@ -95,20 +105,18 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
     public void showComments(String[] commentsID) {
         // Add fragments to stack
         FragmentTransaction fragmentTransaction =  getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.fl_main, CommentsFragment.newInstance(commentsID), CommentsFragment.class.getSimpleName());
+        fragmentTransaction.add(R.id.fl_main, CommentsFragment.newInstance(commentsID), TAG_COMMENTS_FRAGMENT);
         fragmentTransaction.addToBackStack(CommentsFragment.class.getSimpleName());
         fragmentTransaction.commit();
-        showBackButton();
     }
 
     @Override
     public void showReplies(String[] repliesID) {
         // Add fragments to stack
         FragmentTransaction fragmentTransaction =  getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.fl_main, RepliesFragment.newInstance(repliesID), RepliesFragment.class.getSimpleName());
+        fragmentTransaction.add(R.id.fl_main, RepliesFragment.newInstance(repliesID), TAG_REPLIES_FRAGMENT);
         fragmentTransaction.addToBackStack(RepliesFragment.class.getSimpleName());
         fragmentTransaction.commit();
-        showBackButton();
     }
 
     @Override
@@ -121,11 +129,17 @@ public class MainActivity extends AppCompatActivity implements TopStoriesFragmen
         Fragment displayFragment = getSupportFragmentManager().findFragmentById(R.id.fl_main);
 
         // Set correct title
-        if (displayFragment instanceof TopStoriesFragment)
+        if (displayFragment instanceof TopStoriesFragment) {
             getSupportActionBar().setTitle(R.string.title_top_stories);
-        else if (displayFragment instanceof CommentsFragment)
+            hideBackButton();
+        }
+        else if (displayFragment instanceof CommentsFragment) {
             getSupportActionBar().setTitle(R.string.title_comments);
-        else
+            showBackButton();
+        }
+        else {
             getSupportActionBar().setTitle(R.string.title_replies);
+            showBackButton();
+        }
     }
 }

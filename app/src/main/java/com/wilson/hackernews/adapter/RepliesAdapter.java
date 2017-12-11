@@ -1,9 +1,7 @@
 package com.wilson.hackernews.adapter;
 
 import android.content.Context;
-import android.os.Build;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +13,8 @@ import com.wilson.hackernews.other.MyApp;
 import com.wilson.hackernews.other.Utils;
 
 import java.util.List;
+
+import static com.wilson.hackernews.other.Utils.getStyledText;
 
 public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.HackerNewsCommentHolder> {
 
@@ -48,10 +48,7 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.HackerNe
         holder.properties.setText(context.getString(R.string.comment_properties, byName, timeReplied));
 
         // Display comments with HTML entities
-        if (Build.VERSION.SDK_INT >= 24)
-            holder.content.setText(Html.fromHtml(content , Html.FROM_HTML_MODE_LEGACY));
-        else
-            holder.content.setText(Html.fromHtml(content));
+        holder.content.setText(getStyledText(content));
     }
 
     @Override

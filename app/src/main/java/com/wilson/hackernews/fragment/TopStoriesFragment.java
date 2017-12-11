@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,12 +31,16 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.wilson.hackernews.other.Constants.TOP_STORIES_FRAGMENT_PRESENTER_KEY;
+import static com.wilson.hackernews.other.Constants.TOP_STORIES_FRAGMENT_STORY_LIST_KEY;
+
 public class TopStoriesFragment extends Fragment implements GetHackerNewsContract.StoriesView, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, TopStoriesAdapter.CommentsClickedListener {
 
     private static final String TAG = "TopStoriesFragment";
     private TopStoriesAdapter topStoriesAdapter;
     private List<HackerNewsStory> hackerNewsStoryList = new ArrayList<>();
     private TopStoriesListener delegate;
+    private RecyclerView.LayoutManager mLayoutManager;
     private boolean moreStories = false;
 
     // Interface to pass show comments event to parent MainActivity
@@ -71,21 +75,46 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
         super.onViewCreated(view, savedInstanceState);
 
         MyApp.getAppComponent().inject(this);
-        presenter.setView(this);
+
+        if (savedInstanceState != null) {
+            hackerNewsStoryList.addAll(savedInstanceState.getParcelableArrayList(TOP_STORIES_FRAGMENT_STORY_LIST_KEY));
+            HNStoriesPresenter mPresenter = savedInstanceState.getParcelable(TOP_STORIES_FRAGMENT_PRESENTER_KEY);
+
+            if (mPresenter != null)
+                presenter = mPresenter;
+
+            presenter.setView(this);
+            presenter.checkHasMoreStories();
+        }
+        else {
+            presenter.setView(this);
+            presenter.loadNewStories();
+        }
+
         topStoriesSRL.setOnRefreshListener(this);
 
         topStoriesAdapter = new TopStoriesAdapter(this);
         topStoriesAdapter.setData(hackerNewsStoryList);
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        mLayoutManager = new LinearLayoutManager(getContext());
         topStoriesRV.setLayoutManager(mLayoutManager);
         topStoriesRV.setAdapter(topStoriesAdapter);
         loadMoreTV.setOnClickListener(this);
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Use bundle to save stories list and presenter.
+        // Should be updated to use the new arch component (viewmodel, livedata, etc.) in the future.
+        outState.putParcelableArrayList(TOP_STORIES_FRAGMENT_STORY_LIST_KEY, (ArrayList<? extends Parcelable>) hackerNewsStoryList);
+        outState.putParcelable(TOP_STORIES_FRAGMENT_PRESENTER_KEY, presenter);
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
         try {
             delegate = (TopStoriesListener) context;
         } catch (ClassCastException e) {
@@ -96,7 +125,6 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
 
     @Override
     public void onRefresh() {
-        Log.d(TAG, "onRefresh()");
         hackerNewsStoryList.clear();
         topStoriesAdapter.notifyDataSetChanged();
         hideLoadMore();
@@ -106,10 +134,13 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
     @Override
     public void onClick(View v) {
         topStoriesSRL.setRefreshing(true);
-        hackerNewsStoryList.clear();
-        topStoriesAdapter.notifyDataSetChanged();
         hideLoadMore();
         presenter.loadMoreStories();
+    }
+
+    @Override
+    public void onFetchTopStoriesIdSuccess() {
+        hackerNewsStoryList.clear();
     }
 
     @Override
@@ -119,17 +150,15 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
 
     @Override
     public void onFetchStoriesSuccess(List<HackerNewsStory> hackerNewsStoryList) {
-        Log.d(TAG, "onFetchCommentsSuccess: " + hackerNewsStoryList.size());
-        this.hackerNewsStoryList.clear();
         this.hackerNewsStoryList.addAll(hackerNewsStoryList);
-        Log.d(TAG, "hackerNewsStoryList: " + this.hackerNewsStoryList.size());
         topStoriesAdapter.notifyDataSetChanged();
         topStoriesSRL.setRefreshing(false);
+        ((LinearLayoutManager)topStoriesRV.getLayoutManager()).scrollToPositionWithOffset(topStoriesAdapter.getItemCount() - 11, 0);
         showStoriesLoaded();
     }
 
     @Override
-    public void onFecthStoriesError() {
+    public void onFetchStoriesError() {
         topStoriesSRL.setRefreshing(false);
         showStoriesEmpty();
     }

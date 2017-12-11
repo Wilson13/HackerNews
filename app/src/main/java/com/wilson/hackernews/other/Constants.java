@@ -14,7 +14,19 @@ public class Constants {
 
     public static final int NUM_SECONDS_MINUTE = 60;
 
-    public static final String COMMENTS_FRAGMENT_ARGUMENT_KEY = "HackerNewsComment";
+    public static final String TOP_STORIES_FRAGMENT_STORY_LIST_KEY = "HackerNewsStoryList";
 
-    public static final String REPLIES_FRAGMENT_ARGUMENT_KEY = "HackerNewsReplies";
+    public static final String TOP_STORIES_FRAGMENT_PRESENTER_KEY = "HNStoriesPresenter";
+
+    public static final String COMMENTS_FRAGMENT_COMMENTS_ID_KEY = "CommentsFragment";
+
+    public static final String COMMENTS_FRAGMENT_COMMENT_LIST_KEY = "HackerNewsStoryList";
+
+    public static final String COMMENTS_FRAGMENT_PRESENTER_KEY = "HNCommentsPresenter";
+
+    public static final String REPLIES_FRAGMENT_ARGUMENT_KEY = "RepliesFragment";
+
+    public static final String REPLIES_FRAGMENT_REPLY_LIST_KEY = "HackerNewsRepliesList";
+
+    public static final String REPLIES_FRAGMENT_PRESENTER_KEY = "HNCommentsRepliesPresenter";
 }

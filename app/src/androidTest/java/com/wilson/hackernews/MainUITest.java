@@ -1,16 +1,22 @@
 package com.wilson.hackernews;
 
+import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
+import android.support.test.espresso.core.internal.deps.guava.collect.Iterables;
 import android.support.test.espresso.intent.Intents;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import android.support.test.runner.lifecycle.Stage;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
@@ -33,14 +39,18 @@ import org.junit.runner.RunWith;
 
 import java.io.IOException;
 
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.swipeDown;
 import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasAction;
+import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayingAtLeast;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -63,6 +73,24 @@ public class MainUITest {
 
     @Before
     public void setup() throws IOException {
+
+    }
+
+    @Test
+    public void useAppContext() throws Exception {
+        // Context of the app under test.
+        Context appContext = InstrumentationRegistry.getTargetContext();
+        assertEquals("com.wilson.hackernews", appContext.getPackageName());
+    }
+
+    @Test
+    public void MyAppTest() throws Exception {
+        Assert.assertNotNull(MyApp.get());
+    }
+
+    @Test
+    public void MainUITest() throws Throwable {
+
         String storyResponse = "{\n" +
                 "  \"by\" : \"heshamg\",\n" +
                 "  \"descendants\" : 101,\n" +
@@ -133,6 +161,7 @@ public class MainUITest {
         //Set a response for retrofit to handle.
         MockWebServer server = new MockWebServer();
         server.enqueue(new MockResponse().setBody("[ 15683275, 15683275, 15683275, 15683275, 15683275, 15683275, 15683275, 15683275, 15683275, 15683275, 15683275 ]"));
+        // 10 responses + 1 more for load more function
         server.enqueue(new MockResponse().setBody(storyResponse));
         server.enqueue(new MockResponse().setBody(storyResponse));
         server.enqueue(new MockResponse().setBody(storyResponse));
@@ -145,6 +174,7 @@ public class MainUITest {
         server.enqueue(new MockResponse().setBody(storyResponse));
         server.enqueue(new MockResponse().setBody(storyResponse));
 
+        // 10 responses + 1 more for load more function
         server.enqueue(new MockResponse().setBody(commentResponse));
         server.enqueue(new MockResponse().setBody(commentResponse));
         server.enqueue(new MockResponse().setBody(commentResponse));
@@ -157,6 +187,7 @@ public class MainUITest {
         server.enqueue(new MockResponse().setBody(commentResponse));
         server.enqueue(new MockResponse().setBody(commentResponse));
 
+        // 10 responses + 1 more for load more function
         server.enqueue(new MockResponse().setBody(replyResponse));
         server.enqueue(new MockResponse().setBody(replyResponse));
         server.enqueue(new MockResponse().setBody(replyResponse));
@@ -169,34 +200,32 @@ public class MainUITest {
         server.enqueue(new MockResponse().setBody(replyResponse));
         server.enqueue(new MockResponse().setBody(replyResponse));
 
+        // Called once for checking that load more button is not displayed when onRefresh() method is called
+        //server.enqueue(new MockResponse().setBody("[ 15683275 ]"));
+        //server.enqueue(new MockResponse().setBody(oneKidStoryResponse));
+        //server.enqueue(new MockResponse().setBody(emptyKidsCommentResponse));
+
+        //server.enqueue(new MockResponse().setBody("[ 15683275 ]"));
+        //server.enqueue(new MockResponse().setBody(oneKidStoryResponse));
+        //server.enqueue(new MockResponse().setBody(emptyKidsCommentResponse));
+
+        // Called once more for reloading stories into layout
         server.enqueue(new MockResponse().setBody("[ 15683275 ]"));
-        server.enqueue(new MockResponse().setBody("[ 15683275 ]"));
-        server.enqueue(new MockResponse().setBody("[ 15683275 ]"));
+        // Return one story with comments to click on
         server.enqueue(new MockResponse().setBody(oneKidStoryResponse));
+        // Return one comment with no replies to click on
         server.enqueue(new MockResponse().setBody(emptyKidsCommentResponse));
 
+        // Called again for reloading stories into layout
         server.enqueue(new MockResponse().setBody("[ 15683275 ]"));
+        // Return one story with no comments to click on
         server.enqueue(new MockResponse().setBody(emptyKidStoryResponse));
+
+        // Start MockWebServer
         server.play();
 
         String url = server.getUrl("/").toString();
         Constants.HACKER_NEWS_BASE_URL = url;
-    }
-
-    @Test
-    public void useAppContext() throws Exception {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getTargetContext();
-        assertEquals("com.wilson.hackernews", appContext.getPackageName());
-    }
-
-    @Test
-    public void MyAppTest() throws Exception {
-        Assert.assertNotNull(MyApp.get());
-    }
-
-    @Test
-    public void MainUITest() throws Throwable {
 
         Intent intent = new Intent();
         mainActivity.launchActivity(intent);
@@ -211,7 +240,10 @@ public class MainUITest {
         onView(withId(R.id.tv_load_more_stories)).perform(click());
 
         // Check that "{N} comments" button was displayed
-        onView(withId(R.id.tv_comments)).check(matches(isDisplayed()));
+        //onView(allOf(withId(R.id.tv_comments), withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE))).check(matches(isDisplayed()));
+
+        onView(withId(R.id.rv_top_stories))
+                .check(matches(allOf(hasDescendant(withId(R.id.tv_comments)), isDisplayed())));
 
         // Click first story's comments on the list
         onView(withId(R.id.rv_top_stories))
@@ -219,6 +251,14 @@ public class MainUITest {
 
         // Check that CommentsFragment is displayed when "Comments" was clicked
         onView(withId(R.id.ll_comments)).check(matches(isDisplayed()));
+
+        // Test screen rotation on CommentsFragment
+        rotateScreen();
+
+        onView(withId(R.id.tv_view_replies)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+
+        // Restore screen orientation
+        rotateScreen();
 
         // Click on "Load more" for more comments
         onView(withId(R.id.tv_load_more_comments)).perform(click());
@@ -230,24 +270,33 @@ public class MainUITest {
         // Check that RepliesFragment is displayed if "View Replies" was clicked
         onView(withId(R.id.ll_replies)).check(matches(isDisplayed()));
 
+        // Test screen rotation on RepliesFragment
+        rotateScreen();
+
+        onView(withId(R.id.rv_replies)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+
+        // Restore screen orientation
+        rotateScreen();
+
         // Click on "Load more" for more replies
         onView(withId(R.id.tv_load_more_replies)).perform(click());
 
-        Fragment displayFragment = mainActivity.getActivity().getSupportFragmentManager().findFragmentById(R.id.fl_main);
+        Fragment displayFragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fl_main);
 
         if (displayFragment instanceof RepliesFragment) {
 
+            // Check that toolbar is displayed
             onView(withId(R.id.toolbar)).check(matches(isDisplayed()));
+            // Check that toolbar title is correct
             onView(withText(R.string.title_replies)).check(matches(withParent(withId(R.id.toolbar))));
 
             // Check that load more button is displayed when showLoadMore() method is called
             runOnUiThread(((RepliesFragment) displayFragment)::showLoadMore);
             onView(withId(R.id.tv_load_more_replies)).check(matches(isDisplayed()));
 
-            // Check that empty reply layout is displayed when onFecthStoriesError() method is called
+            // Check that empty reply layout is displayed when onFetchStoriesError() method is called
             runOnUiThread(((RepliesFragment) displayFragment)::onFecthStoriesError);
             onView(withId(R.id.ll_empty_replies)).check(matches(isDisplayed()));
-
         }
 
         // Click on navigation up button to return to CommentsFragment
@@ -259,7 +308,7 @@ public class MainUITest {
         // Check that CommentsFragment is displayed
         onView(withId(R.id.ll_comments)).check(matches(isDisplayed()));
 
-        displayFragment = mainActivity.getActivity().getSupportFragmentManager().findFragmentById(R.id.fl_main);
+        displayFragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fl_main);
 
         if (displayFragment instanceof CommentsFragment) {
 
@@ -267,10 +316,9 @@ public class MainUITest {
             runOnUiThread(((CommentsFragment) displayFragment)::showLoadMore);
             onView(withId(R.id.tv_load_more_comments)).check(matches(isDisplayed()));
 
-            // Check that empty comment layout is displayed when onFecthStoriesError() method is called
+            // Check that empty comment layout is displayed when onFetchStoriesError() method is called
             runOnUiThread(((CommentsFragment) displayFragment)::onFecthStoriesError);
             onView(withId(R.id.ll_empty_comments)).check(matches(isDisplayed()));
-
         }
 
         // Click on navigation up button to return to TopStoriesFragment
@@ -291,7 +339,7 @@ public class MainUITest {
         intended(expectedIntent);
         Intents.release();
 
-        displayFragment = mainActivity.getActivity().getSupportFragmentManager().findFragmentById(R.id.fl_main);
+        displayFragment = getCurrentActivity().getSupportFragmentManager().findFragmentById(R.id.fl_main);
 
         if (displayFragment instanceof TopStoriesFragment) {
 
@@ -299,43 +347,105 @@ public class MainUITest {
             runOnUiThread(((TopStoriesFragment) displayFragment)::showLoadMore);
             onView(withId(R.id.tv_load_more_stories)).check(matches(isDisplayed()));
 
-            // Check that load more button is not displayed when onRefresh() method is called
-            runOnUiThread(((TopStoriesFragment) displayFragment)::onRefresh);
+            // Check that load more button is not displayed when hideLoadMore() method is called
+            runOnUiThread(((TopStoriesFragment) displayFragment)::hideLoadMore);
             onView(withId(R.id.tv_load_more_stories)).check(matches(not(isDisplayed())));
 
-            // Check that empty story layout is displayed when onFecthStoriesError() method is called
-            runOnUiThread(((TopStoriesFragment) displayFragment)::onFecthStoriesError);
+            // Check that empty story layout is displayed when onFetchStoriesError() method is called
+            runOnUiThread(((TopStoriesFragment) displayFragment)::onFetchStoriesError);
             onView(withId(R.id.ll_empty_stories)).check(matches(isDisplayed()));
-
         }
+
+        // This sleep is required for the refresh to finish
+        //Thread.sleep(2000);
 
         // Couldn't break these tests into different files as they all rely on
         // same activity, running them together in separate test files would fail.
-        //Reload stories
-        runOnUiThread(((TopStoriesFragment) displayFragment)::onRefresh);
+
+        //Reload stories (calling onRefresh directly cause error, not sure about the reason)
+
+        /*Fragment finalDisplayFragment = displayFragment;
+        Runnable myRunnable = new Runnable(){
+            @Override
+            public void run(){
+                // What you want to run //
+                ((TopStoriesFragment) finalDisplayFragment).onRefresh();
+            }
+        };*/
+
+        //runOnUiThread(myRunnable);
+        //InstrumentationRegistry.getInstrumentation().waitForIdle(myRunnable);
+        onView(withId(R.id.srl_top_stories))
+                .perform(withCustomConstraints(swipeDown(), isDisplayingAtLeast(85)));
+
+        // Check that load more button is not displayed when onRefresh() method is called
+        //runOnUiThread(((TopStoriesFragment) displayFragment)::onRefresh);
+        //onView(withId(R.id.tv_load_more_stories)).check(matches(not(isDisplayed())));
 
         // This sleep is required for the refresh to finish
-        Thread.sleep(1000);
+        //Thread.sleep(3000);
+
+        // Check that TopStoriesFragment is displayed
+        onView(withId(R.id.ll_stories)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
 
         // Click first story's comments on the list
         onView(withId(R.id.rv_top_stories))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, ClickAction.clickChildViewWithId(R.id.tv_comments)));
 
+        // This sleep is required for the load to finish
+        //Thread.sleep(2000);
+
+        // Check that CommentsFragment is displayed
+        onView(withId(R.id.ll_comments)).check(matches(isDisplayed()));
+
         // Check that no "View replies" button was displayed
-        onView(withId(R.id.tv_view_replies)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
+        onView(withId(R.id.tv_view_replies)).check(matches(not(isDisplayed())));
 
         // Click on navigation up button to return to TopStoriesFragment
         onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click());
 
+        // Test screen rotation on TopStoriesFragment
+        rotateScreen();
+
+        onView(withId(R.id.tv_comments)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+
+        // Restore screen orientation
+        rotateScreen();
+
         // Check that load more button is not displayed when onRefresh() method is called
-        runOnUiThread(((TopStoriesFragment) displayFragment)::onRefresh);
+        //runOnUiThread(((TopStoriesFragment) displayFragment)::onRefresh);
+        onView(withId(R.id.srl_top_stories))
+                .perform(withCustomConstraints(swipeDown(), isDisplayingAtLeast(95)));
 
         // This sleep is required for the refresh to finish
-        Thread.sleep(1000);
+        Thread.sleep(2000);
 
         // Check that no "{N} comments" button was displayed
-        onView(withId(R.id.tv_comments)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
-        //while(true) ;
+        onView(withId(R.id.tv_comments)).check(matches(not(isDisplayed())));
+    }
+
+    private void rotateScreen() {
+        Context context = InstrumentationRegistry.getTargetContext();
+        int orientation = context.getResources().getConfiguration().orientation;
+
+        Activity activity = mainActivity.getActivity();
+        activity.setRequestedOrientation(
+                (orientation == Configuration.ORIENTATION_PORTRAIT) ?
+                        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE :
+                        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    }
+
+    // mainActivity.getActivity() would not return the
+    // current activity and would cause problem after screen
+    // rotation as Android destroy and create new activity
+    private MainActivity getCurrentActivity() throws Throwable {
+        getInstrumentation().waitForIdleSync();
+        final MainActivity[] activity = new MainActivity[1];
+        runOnUiThread(() -> {
+            java.util.Collection<Activity> activities = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
+            activity[0] = (MainActivity) Iterables.getOnlyElement(activities);
+        });
+        return activity[0];
     }
 
     public static class ClickAction {
@@ -370,5 +480,24 @@ public class MainUITest {
                 }
             };
         }
+    }
+
+    public static ViewAction withCustomConstraints(final ViewAction action, final Matcher<View> constraints) {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return constraints;
+            }
+
+            @Override
+            public String getDescription() {
+                return action.getDescription();
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                action.perform(uiController, view);
+            }
+        };
     }
 }
