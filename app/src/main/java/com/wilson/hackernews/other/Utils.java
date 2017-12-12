@@ -57,14 +57,10 @@ public class Utils {
         // Use a variable to avoid deprecation warning.
         // Could have used a @SuppressWarnings("deprecation") annotation too.
         Spanned result;
-        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
             result = Html.fromHtml(content, Html.FROM_HTML_MODE_LEGACY);
-            System.out.print(String.valueOf(">= 24: " + Build.VERSION.SDK_INT));
-        }
-        else {
+        else
             result = Html.fromHtml(content);
-            System.out.print(String.valueOf("< 24: " + Build.VERSION.SDK_INT));
-        }
         return result;
     }
 
