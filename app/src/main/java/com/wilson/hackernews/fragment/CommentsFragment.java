@@ -143,11 +143,11 @@ public class CommentsFragment extends Fragment implements GetHackerNewsContract.
     }
 
     @Override
-    public void onFetchCommentsSuccess(List<HackerNewsComment> hackerNewsCommentList) {
+    public void onFetchCommentsSuccess(List<HackerNewsComment> hackerNewsCommentList, int numLoaded) {
         this.hackerNewsCommentList.addAll(hackerNewsCommentList);
         commentsAdapter.notifyDataSetChanged();
         commentsSRL.setRefreshing(false);
-        ((LinearLayoutManager)commentsRV.getLayoutManager()).scrollToPositionWithOffset(commentsAdapter.getItemCount() - 11, 0);
+        ((LinearLayoutManager)commentsRV.getLayoutManager()).scrollToPositionWithOffset(commentsAdapter.getItemCount() - numLoaded, 0);
         showStoriesLoaded();
     }
 

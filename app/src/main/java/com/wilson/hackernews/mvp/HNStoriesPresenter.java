@@ -30,7 +30,7 @@ public class HNStoriesPresenter<V> implements GetHackerNewsContract.StoriesPrese
         this.dataSource = dataSource;
     }
 
-    protected HNStoriesPresenter(Parcel in) {
+    private HNStoriesPresenter(Parcel in) {
         topStoriesID = in.createStringArray();
         numStoriesLoaded = in.readInt();
     }
@@ -90,16 +90,17 @@ public class HNStoriesPresenter<V> implements GetHackerNewsContract.StoriesPrese
         }
 
         // Load NUMBER_OF_STORIES_TO_DISPLAY individual story item
+        int finalCurrentLoaded = currentLoaded;
         dataSource.getStories(storiesToPullList)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(hackerNewsStories -> storiesLoadedHandler(hackerNewsStories),
+            .subscribe(hackerNewsStories -> storiesLoadedHandler(hackerNewsStories, finalCurrentLoaded),
                     error -> view.onFetchStoriesError()
             );
     }
 
-    private void storiesLoadedHandler(List<HackerNewsStory> hackerNewsStories) {
-        view.onFetchStoriesSuccess(hackerNewsStories);
+    private void storiesLoadedHandler(List<HackerNewsStory> hackerNewsStories, int numLoaded) {
+        view.onFetchStoriesSuccess(hackerNewsStories, numLoaded);
         checkHasMoreStories();
     }
 

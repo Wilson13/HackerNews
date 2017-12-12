@@ -96,7 +96,7 @@ public class HNCommentsPresenterTest {
         verify(dataSource).getComments(commentsToPullList);
 
         dataSource.getComments(commentsToPullList).subscribe(); // This line is required for  verify(commentsView).onFetchStoriesSuccess to work
-        verify(commentsView).onFetchCommentsSuccess(hackerNewsCommentList);
+        verify(commentsView).onFetchCommentsSuccess(hackerNewsCommentList, 2);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class HNCommentsPresenterTest {
         verify(dataSource).getComments(commentsToPullList);
 
         dataSource.getComments(commentsToPullList).subscribe();
-        verify(commentsView).onFetchCommentsSuccess(hackerNewsCommentList);
+        verify(commentsView).onFetchCommentsSuccess(hackerNewsCommentList, 10);
         verify(commentsView).showLoadMore();
     }
 

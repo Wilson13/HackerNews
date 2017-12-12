@@ -82,14 +82,15 @@ public class HNCommentsPresenter<V> implements GetHackerNewsContract.CommentsPre
             currentLoaded++;
         }
 
+        int finalCurrentLoaded = currentLoaded;
         dataSource.getComments(commentsToPullList)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::commentsLoadedHandler, error -> view.onFecthStoriesError());
+                .subscribe(hackerNewsComments -> commentsLoadedHandler(hackerNewsComments, finalCurrentLoaded), error -> view.onFecthStoriesError());
     }
 
-    private void commentsLoadedHandler(List<HackerNewsComment> hackerNewsComments) {
-        view.onFetchCommentsSuccess(hackerNewsComments);
+    private void commentsLoadedHandler(List<HackerNewsComment> hackerNewsComments, int numLoaded) {
+        view.onFetchCommentsSuccess(hackerNewsComments, numLoaded);
         checkHasMoreStories();
     }
 

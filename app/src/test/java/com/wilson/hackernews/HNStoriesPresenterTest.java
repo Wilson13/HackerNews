@@ -95,7 +95,7 @@ public class HNStoriesPresenterTest {
         verify(storiesView, atLeastOnce()).onFetchStoriesStart();
         verify(dataSource).getStories(storiesToPullList);
         dataSource.getStories(storiesToPullList).subscribe(); // This line is required for  verify(storiesView).onFetchStoriesSuccess to work
-        verify(storiesView).onFetchStoriesSuccess(hackerNewsStoryList);
+        verify(storiesView).onFetchStoriesSuccess(hackerNewsStoryList, 2);
         verify(storiesView).hideLoadMore();
     }
 
@@ -123,7 +123,7 @@ public class HNStoriesPresenterTest {
         verify(dataSource).getStories(storiesToPullList);
 
         dataSource.getStories(storiesToPullList).subscribe(); // This line is required for  verify(storiesView).onFetchStoriesSuccess to work
-        verify(storiesView).onFetchStoriesSuccess(hackerNewsStoryList);
+        verify(storiesView).onFetchStoriesSuccess(hackerNewsStoryList, 10);
         verify(storiesView).showLoadMore();
     }
 

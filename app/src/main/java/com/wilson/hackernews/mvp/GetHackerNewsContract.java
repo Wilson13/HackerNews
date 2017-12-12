@@ -21,7 +21,7 @@ public interface GetHackerNewsContract {
 
         void onFetchStoriesStart();
 
-        void onFetchStoriesSuccess(List<HackerNewsStory> hackerNewsStoryList);
+        void onFetchStoriesSuccess(List<HackerNewsStory> hackerNewsStoryList, int numLoaded);
 
         void onFetchStoriesError();
 
@@ -42,7 +42,7 @@ public interface GetHackerNewsContract {
 
         void onFetchStoriesStart();
 
-        void onFetchCommentsSuccess(List<HackerNewsComment> hackerNewsCommentList);
+        void onFetchCommentsSuccess(List<HackerNewsComment> hackerNewsCommentList, int numLoaded);
 
         void onFecthStoriesError();
 

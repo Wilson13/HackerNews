@@ -2,6 +2,7 @@ package com.wilson.hackernews.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +48,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
 
         String content = currentItem.getText();
         String byName = currentItem.getBy();
-        final String[] kids = currentItem.getKids();
+        String[] kids = currentItem.getKids();
         long time = currentItem.getTime();
 
         // Unix time is in seconds
@@ -57,13 +58,20 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Hacker
         holder.properties.setText(context.getString(R.string.comment_properties, byName, timeCommented));
 
         // Display comments with HTML entities
-        if (content != null)
+        if (!TextUtils.isEmpty(content))
             holder.content.setText(getStyledText(content));
 
         // Display "View replies" if there are replies to this comment
         // (showing only 1 level as stated in the requirement).
-        if (kids == null || kids.length <= 0)
+        if (kids == null || kids.length <= 0) {
             holder.viewReplies.setVisibility(View.GONE);
+        }
+        // According to design, this else statement is redundant.
+        // However I found out that loading new comments seem to make
+        // some supposedly visible "View replies" button invisible.
+        // Hence this was added to make the UI correct.
+        else
+            holder.viewReplies.setVisibility(View.VISIBLE);
     }
 
     @Override

@@ -149,11 +149,11 @@ public class TopStoriesFragment extends Fragment implements GetHackerNewsContrac
     }
 
     @Override
-    public void onFetchStoriesSuccess(List<HackerNewsStory> hackerNewsStoryList) {
+    public void onFetchStoriesSuccess(List<HackerNewsStory> hackerNewsStoryList, int numLoaded) {
         this.hackerNewsStoryList.addAll(hackerNewsStoryList);
         topStoriesAdapter.notifyDataSetChanged();
         topStoriesSRL.setRefreshing(false);
-        ((LinearLayoutManager)topStoriesRV.getLayoutManager()).scrollToPositionWithOffset(topStoriesAdapter.getItemCount() - 11, 0);
+        ((LinearLayoutManager)topStoriesRV.getLayoutManager()).scrollToPositionWithOffset(topStoriesAdapter.getItemCount() - numLoaded, 0);
         showStoriesLoaded();
     }
 

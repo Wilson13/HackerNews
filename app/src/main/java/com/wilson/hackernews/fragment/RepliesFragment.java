@@ -117,8 +117,6 @@ public class RepliesFragment extends Fragment implements GetHackerNewsContract.C
     @Override
     public void onClick(View v) {
         repliesSRL.setRefreshing(true);
-        hackerNewsRepliesList.clear();
-        repliesAdapter.notifyDataSetChanged();
         hideLoadMore();
         presenter.loadMoreComments();
     }
@@ -129,11 +127,11 @@ public class RepliesFragment extends Fragment implements GetHackerNewsContract.C
     }
 
     @Override
-    public void onFetchCommentsSuccess(List<HackerNewsComment> hackerNewsCommentList) {
-        this.hackerNewsRepliesList.clear();
+    public void onFetchCommentsSuccess(List<HackerNewsComment> hackerNewsCommentList, int numLoaded) {
         this.hackerNewsRepliesList.addAll(hackerNewsCommentList);
         repliesAdapter.notifyDataSetChanged();
         repliesSRL.setRefreshing(false);
+        ((LinearLayoutManager)repliesRV.getLayoutManager()).scrollToPositionWithOffset(repliesAdapter.getItemCount() - numLoaded, 0);
         showStoriesLoaded();
     }
 
